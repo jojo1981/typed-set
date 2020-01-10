@@ -253,12 +253,14 @@ class Set implements \Countable, \IteratorAggregate
     private function getHashForElement($element): string
     {
         if (\is_object($element)) {
-            if ($element instanceof HashableInterface) {
-                return $element->getHash();
-            }
+            if ($this->type instanceof ClassType) {
+                if ($element instanceof HashableInterface) {
+                    return $element->getHash();
+                }
 
-            if (GlobalHandler::getInstance()->support($element, $this->type)) {
-                return GlobalHandler::getInstance()->getHash($element, $this->type);
+                if (GlobalHandler::getInstance()->support($element, $this->type)) {
+                    return GlobalHandler::getInstance()->getHash($element, $this->type);
+                }
             }
 
             return \spl_object_hash($element);

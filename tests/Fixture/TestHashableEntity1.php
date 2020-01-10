@@ -14,7 +14,7 @@ use Jojo1981\TypedSet\HashableInterface;
 /**
  * @package Jojo1981\TypedSet\TestSuite\Fixture
  */
-class TestHashableEntity implements HashableInterface
+class TestHashableEntity1 implements HashableInterface
 {
     /** @var string */
     private $name;

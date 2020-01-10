@@ -28,7 +28,7 @@ use Jojo1981\TypedSet\TestSuite\Fixture\AbstractTestEntity;
 use Jojo1981\TypedSet\TestSuite\Fixture\InterfaceTestEntity;
 use Jojo1981\TypedSet\TestSuite\Fixture\TestEntity;
 use Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase;
-use Jojo1981\TypedSet\TestSuite\Fixture\TestHashableEntity;
+use Jojo1981\TypedSet\TestSuite\Fixture\TestHashableEntity1;
 
 /**
  * @package Jojo1981\TypedSet\TestSuite\DataProvider
@@ -82,9 +82,9 @@ final class SetDataProvider
                 [$iterable1, $iterable2]
             ],
             [
-                TestHashableEntity::class,
-                [new TestHashableEntity('car'), new TestHashableEntity('house'), new TestHashableEntity('car'), new TestHashableEntity('boat')],
-                [new TestHashableEntity('car'), new TestHashableEntity('house'), new TestHashableEntity('boat')]
+                TestHashableEntity1::class,
+                [new TestHashableEntity1('car'), new TestHashableEntity1('house'), new TestHashableEntity1('car'), new TestHashableEntity1('boat')],
+                [new TestHashableEntity1('car'), new TestHashableEntity1('house'), new TestHashableEntity1('boat')]
             ]
         ];
     }
@@ -471,23 +471,23 @@ final class SetDataProvider
                 false
             ],
             [
-                new Set(TestHashableEntity::class, []),
-                new Set(TestHashableEntity::class, []),
+                new Set(TestHashableEntity1::class, []),
+                new Set(TestHashableEntity1::class, []),
                 true
             ],
             [
-                new Set(TestHashableEntity::class, [new TestHashableEntity('test')]),
-                new Set(TestHashableEntity::class, []),
+                new Set(TestHashableEntity1::class, [new TestHashableEntity1('test')]),
+                new Set(TestHashableEntity1::class, []),
                 false
             ],
             [
-                new Set(TestHashableEntity::class, [new TestHashableEntity('test')]),
-                new Set(TestHashableEntity::class, [new TestHashableEntity('test')]),
+                new Set(TestHashableEntity1::class, [new TestHashableEntity1('test')]),
+                new Set(TestHashableEntity1::class, [new TestHashableEntity1('test')]),
                 true
             ],
             [
-                new Set(TestHashableEntity::class, [new TestHashableEntity('test1'), new TestHashableEntity('test2')]),
-                new Set(TestHashableEntity::class, [new TestHashableEntity('test2')]),
+                new Set(TestHashableEntity1::class, [new TestHashableEntity1('test1'), new TestHashableEntity1('test2')]),
+                new Set(TestHashableEntity1::class, [new TestHashableEntity1('test2')]),
                 false
             ]
         ];

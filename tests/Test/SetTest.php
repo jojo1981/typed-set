@@ -17,6 +17,8 @@ use Jojo1981\TypedSet\Handler\GlobalHandler;
 use Jojo1981\TypedSet\Set;
 use Jojo1981\TypedSet\TestSuite\Fixture\StringHandler;
 use Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase;
+use Jojo1981\TypedSet\TestSuite\Fixture\TestHashableEntity1;
+use Jojo1981\TypedSet\TestSuite\Fixture\TestHashableEntity2;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
@@ -76,10 +78,10 @@ class SetTest extends TestCase
      * @param string $type
      * @param array $elements
      * @param array $expectedArray
-     * @return void
-     *@throws SetException
+     * @throws SetException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @return void
      */
     public function testIgnoringDuplicates(string $type, array $elements, array $expectedArray): void
     {
@@ -472,5 +474,22 @@ class SetTest extends TestCase
         $this->assertEquals('int', $set->getType());
         $this->assertCount(3, $set);
         $this->assertEquals([1,2,3], $set->toArray());
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     * @throws SetException
+     * @throws ExpectationFailedException
+     * @return void
+     */
+    public function testWithDifferenceClassesWithAreHashable(): void
+    {
+        $item1 = new TestHashableEntity1('name');
+        $item2 = new TestHashableEntity1('name');
+        $item3 = new TestHashableEntity2('name');
+        $item4 = new TestHashableEntity2('name');
+
+        $set = new Set('object', [$item1, $item2, $item3, $item4]);
+        $this->assertCount(4, $set);
     }
 }
