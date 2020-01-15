@@ -98,7 +98,7 @@ class SetTest extends TestCase
     public function testConstructWithInvalidTypeShouldThrowCollectionException(string $invalidType): void
     {
         $this->expectExceptionObject(new SetException(
-            'Given type: `' . $invalidType . '` is not a valid primitive type and also not an existing class'
+            'Given type: `' . $invalidType . '` is not a valid type and also not an existing class'
         ));
         new Set($invalidType);
     }
@@ -420,6 +420,133 @@ class SetTest extends TestCase
     public function testCompare(Set $setA, Set $setB, DifferenceResult $expectedResult): void
     {
         $this->assertEquals($expectedResult, $setA->compare($setB));
+    }
+
+    /**
+     * @throws SetException
+     * @return void
+     */
+    public function testMapWithInvalidTypeShouldThrowSetException(): void
+    {
+        $this->expectExceptionObject(new SetException(
+            'Given type: `invalidType` is not a valid type and also not an existing class'
+        ));
+        (new Set('string', []))->map(static function () {}, 'invalidType');
+    }
+
+    /**
+     * @throws SetException
+     * @return void
+     */
+    public function testMapWithoutTypeOnEmptySetShouldThrowSetException(): void
+    {
+        $this->expectExceptionObject(new SetException('Type can not be omitted on an empty Set'));
+        (new Set('string', []))->map(static function () {});
+    }
+
+    /**
+     * @throws SetException
+     * @return void
+     */
+    public function testMapWithoutTypeWithMapperReturningUnsupportedDataSetShouldThrowSetException(): void
+    {
+        $this->expectExceptionObject(new SetException(
+            'Determined type: `null` is not a valid type and also not an existing class'
+        ));
+        (new Set('string', ['text1']))->map(static function () { return null; });
+    }
+
+    /**
+     * @throws SetException
+     * @return void
+     */
+    public function testMapWithValidTypeWithMapperReturningViolatingDataDataSetShouldThrowSetException(): void
+    {
+        $this->expectExceptionObject(new SetException('Mapper is not returning a correct value. Data is not of type: `int`, but an instance of: `\stdClass`'));
+        $mapper = static function () {
+            return new \stdClass();
+        };
+        (new Set('string', ['text1']))->map($mapper, 'int');
+    }
+
+    /**
+     * @throws SetException
+     * @return void
+     */
+    public function testMapWithoutTypeWithMapperReturningViolatingDataDataSetShouldThrowSetException(): void
+    {
+        $this->expectExceptionObject(new SetException('Mapper is not returning a correct value. Data is not of type: `int`, but of type: `string`'));
+        $isCalled = false;
+        $mapper = static function () use (&$isCalled)  {
+            if (!$isCalled) {
+                $isCalled = true;
+
+                return 1;
+            }
+
+            return 'text';
+        };
+        (new Set('string', ['text1', 'text2']))->map($mapper);
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     * @throws SetException
+     * @throws ExpectationFailedException
+     * @return void
+     */
+    public function testMapWithValidTypeAndEmptySetShouldReturnNewMappedSet(): void
+    {
+        $set1 = new Set('text');
+        $this->assertEquals('string', $set1->getType());
+        $set2 = $set1->map(static function () {}, 'integer');
+        $this->assertEquals('int', $set2->getType());
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     * @throws SetException
+     * @throws ExpectationFailedException
+     * @return void
+     */
+    public function testMapWithValidTypeAndNonEmptySetShouldReturnNewMappedSet(): void
+    {
+        $originalSet = new Set('text', ['text2', 'text1', 'text3']);
+        $this->assertEquals('string', $originalSet->getType());
+        $this->assertCount(3, $originalSet);
+        $this->assertEquals(['text2', 'text1', 'text3'], $originalSet->toArray());
+
+        $mapper = static function (string $text): int {
+            return (int) \substr($text, -1);
+        };
+
+        $newMappedSet = $originalSet->map($mapper, 'integer');
+        $this->assertEquals('int', $newMappedSet->getType());
+        $this->assertCount(3, $newMappedSet);
+        $this->assertEquals([2, 1, 3], $newMappedSet->toArray());
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     * @throws SetException
+     * @throws ExpectationFailedException
+     * @return void
+     */
+    public function testMapWithoutTypeAndNonEmptySetShouldReturnNewMappedSet(): void
+    {
+        $originalSet = new Set('text', ['text2', 'text1', 'text3']);
+        $this->assertEquals('string', $originalSet->getType());
+        $this->assertCount(3, $originalSet);
+        $this->assertEquals(['text2', 'text1', 'text3'], $originalSet->toArray());
+
+        $mapper = static function (string $text): int {
+            return (int) \substr($text, -1);
+        };
+
+        $newMappedSet = $originalSet->map($mapper);
+        $this->assertEquals('int', $newMappedSet->getType());
+        $this->assertCount(3, $newMappedSet);
+        $this->assertEquals([2, 1, 3], $newMappedSet->toArray());
     }
 
     /**

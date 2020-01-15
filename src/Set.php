@@ -40,7 +40,7 @@ class Set implements \Countable, \IteratorAggregate
      */
     public function __construct(string $type, array $elements = [])
     {
-        static::assertType($type);
+        static::assertGivenType($type);
         $this->type = self::createTypeFromName($type);
         $this->addAll($elements);
     }
@@ -175,7 +175,7 @@ class Set implements \Countable, \IteratorAggregate
     public function compare(Set $other): DifferenceResult
     {
         if (!$this->isEqualType($other->type)) {
-            throw new SetException('Can not compare 2 sets of different types');
+            throw SetException::canNotCompareSetsOfDifferenceType();
         }
 
         $lhsElementsMissing = [];
@@ -211,6 +211,46 @@ class Set implements \Countable, \IteratorAggregate
     }
 
     /**
+     * Map this Set into new Set using the passed mapper callback. When type is omitted it will be determined by the
+     * first result the mapper function produces.
+     *
+     * @param callable $mapper
+     * @param null|string $type
+     * @throws SetException
+     * @return Set
+     */
+    public function map(callable $mapper, ?string $type = null): Set
+    {
+        if (null === $type && $this->isEmpty()) {
+            throw SetException::typeOmittedOnEmptySet();
+        }
+
+        $typeObject = null;
+        if (null !== $type) {
+            static::assertGivenType($type);
+            $typeObject = self::createTypeFromName($type);
+        } else {
+            $typeObject = self::createTypeFromValue($mapper(\reset($this->elements)));
+            self::assertDeterminedType($typeObject->getName());
+        }
+
+        $newElements = [];
+        foreach ($this->elements as $element) {
+            $newElement = $mapper($element);
+            if (!$typeObject->isAssignableValue($newElement)) {
+                throw SetException::dataIsNotOfExpectedType(
+                    $typeObject,
+                    self::createTypeFromValue($newElement),
+                    'Mapper is not returning a correct value. '
+                );
+            }
+            $newElements[] = $newElement;
+        }
+
+        return new Set($typeObject->getName(), $newElements);
+    }
+
+    /**
      * @return int
      */
     public function count(): int
@@ -235,13 +275,7 @@ class Set implements \Countable, \IteratorAggregate
     {
         if (!$this->type->isAssignableValue($element)) {
             $otherType = self::createTypeFromValue($element);
-            throw new SetException(\sprintf(
-                'Data is not %s: `%s`, but %s: `%s`',
-                $this->type instanceof ClassType ? 'an instance of' : 'of type',
-                $this->type->getName(),
-                $otherType instanceof ClassType ? 'an instance of' : 'of type',
-                $otherType->getName()
-            ));
+            throw SetException::dataIsNotOfExpectedType($this->type, $otherType);
         }
     }
 
@@ -296,13 +330,35 @@ class Set implements \Countable, \IteratorAggregate
      * @throws SetException
      * @return void
      */
-    private static function assertType(string $type): void
+    private static function assertGivenType(string $type): void
     {
         if (\in_array(\strtolower($type), self::NOT_SUPPORTED_TYPES)) {
-            throw SetException::typeIsNotValid($type);
+            throw SetException::givenTypeIsNotValid($type);
         }
 
-        self::createTypeFromName($type);
+        try {
+            self::createTypeFromName($type);
+        } catch (\Exception $exception) {
+            throw SetException::givenTypeIsNotValid($type, $exception);
+        }
+    }
+
+    /**
+     * @param string $type
+     * @throws SetException
+     * @return void
+     */
+    private static function assertDeterminedType(string $type): void
+    {
+        if (\in_array(\strtolower($type), self::NOT_SUPPORTED_TYPES)) {
+            throw SetException::determinedTypeIsNotValid($type);
+        }
+
+        try {
+            self::createTypeFromName($type);
+        } catch (\Exception $exception) { // @codeCoverageIgnore
+            throw SetException::determinedTypeIsNotValid($type, $exception); // @codeCoverageIgnore
+        }
     }
 
     /**
@@ -320,16 +376,16 @@ class Set implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @param string $name
+     * @param string $typeName
      * @throws SetException
      * @return TypeInterface
      */
-    private static function createTypeFromName(string $name): TypeInterface
+    private static function createTypeFromName(string $typeName): TypeInterface
     {
         try {
-            return AbstractType::createFromTypeName($name);
+            return AbstractType::createFromTypeName($typeName);
         } catch (TypeException $exception) {
-            throw SetException::typeIsNotValid($name, $exception);
+            throw SetException::couldNotCreateTypeFromTypeName($typeName, $exception);
         }
     }
 }

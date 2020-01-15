@@ -55,6 +55,7 @@ The set has the following convenient instance methods:
 - isEqualType(TypeInterface $type): bool
 - isEqual(Set $other): bool
 - compare(Set $other): DifferenceResult
+- map(callable $mapper, ?string $type = null): Set
 - count(): int
 
 The `\Jojo1981\TypedSet\Set` has a static method `createFromElements`.
