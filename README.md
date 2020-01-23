@@ -58,6 +58,7 @@ The set has the following convenient instance methods:
 - map(callable $mapper, ?string $type = null): Set
 - filter(callable $predicate): Set
 - find(callable $predicate): mixed
+- some(callable $predicate): bool
 - count(): int
 
 The `\Jojo1981\TypedSet\Set` has a static method `createFromElements`.
