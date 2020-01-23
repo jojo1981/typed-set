@@ -261,6 +261,21 @@ class Set implements \Countable, \IteratorAggregate
     }
 
     /**
+     * @param callable $predicate
+     * @return mixed
+     */
+    public function find(callable $predicate)
+    {
+        foreach ($this->elements as $index => $element) {
+            if (true === $predicate($element, $index)) {
+                return $element;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @return int
      */
     public function count(): int

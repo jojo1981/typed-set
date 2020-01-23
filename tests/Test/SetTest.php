@@ -585,6 +585,42 @@ class SetTest extends TestCase
      * @throws ExpectationFailedException
      * @return void
      */
+    public function testFindEmptySet(): void
+    {
+        $set = new Set('string');
+        $this->assertNull($set->find(static function () {}));
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     * @throws SetException
+     * @throws ExpectationFailedException
+     * @return void
+     */
+    public function testFind(): void
+    {
+        $set = new Set('string', ['text1', 'text2', 'text3']);
+        $this->assertNull($set->find(
+            static function (): bool {
+                return false;
+            }
+        ));
+        $this->assertEquals(
+            'text2',
+            $set->find(
+                static function (string $item): bool {
+                    return 'text2' === $item;
+                }
+            )
+        );
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     * @throws SetException
+     * @throws ExpectationFailedException
+     * @return void
+     */
     public function testCount(): void
     {
         $this->assertCount(0, new Set('string'));
