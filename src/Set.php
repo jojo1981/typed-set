@@ -251,6 +251,16 @@ class Set implements \Countable, \IteratorAggregate
     }
 
     /**
+     * @param callable $predicate
+     * @throws SetException
+     * @return Set
+     */
+    public function filter(callable $predicate): Set
+    {
+        return new Set($this->type->getName(), \array_filter($this->elements, $predicate));
+    }
+
+    /**
      * @return int
      */
     public function count(): int

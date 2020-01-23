@@ -555,6 +555,36 @@ class SetTest extends TestCase
      * @throws ExpectationFailedException
      * @return void
      */
+    public function testFilterEmptySet(): void
+    {
+        $originalSet = new Set('string');
+        $this->assertCount(0, $originalSet);
+        $filteredSet = $originalSet->filter(static function () {});
+        $this->assertCount(0, $filteredSet);
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     * @throws SetException
+     * @throws ExpectationFailedException
+     * @return void
+     */
+    public function testFilter(): void
+    {
+        $originalSet = new Set('string', ['text1', 'text2', 'text3']);
+        $this->assertEquals(['text1', 'text2', 'text3'], $originalSet->toArray());
+        $filteredSet = $originalSet->filter(static function (string $item): bool {
+            return 'text2' !== $item;
+        });
+        $this->assertEquals(['text1', 'text3'], $filteredSet->toArray());
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     * @throws SetException
+     * @throws ExpectationFailedException
+     * @return void
+     */
     public function testCount(): void
     {
         $this->assertCount(0, new Set('string'));
