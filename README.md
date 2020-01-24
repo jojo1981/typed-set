@@ -58,6 +58,7 @@ The set has the following convenient instance methods:
 - map(callable $mapper, ?string $type = null): Set
 - filter(callable $predicate): Set
 - find(callable $predicate): mixed
+- all(callable $predicate): bool
 - some(callable $predicate): bool
 - none(callable $predicate): bool
 - count(): int
