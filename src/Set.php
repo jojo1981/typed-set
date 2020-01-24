@@ -291,6 +291,21 @@ class Set implements \Countable, \IteratorAggregate
     }
 
     /**
+     * @param callable $predicate
+     * @return bool
+     */
+    public function none(callable $predicate): bool
+    {
+        foreach ($this->elements as $index => $element) {
+            if (true === $predicate($element, $index)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @return int
      */
     public function count(): int
