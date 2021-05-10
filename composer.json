@@ -21,6 +21,7 @@
   "require": {
     "php": "^7.1",
     "ext-json": "*",
+    "jojo1981/contracts": "^1.0",
     "jojo1981/php-types": "^1.0"
   },
   "require-dev": {

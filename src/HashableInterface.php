@@ -9,13 +9,12 @@
  */
 namespace Jojo1981\TypedSet;
 
+use Jojo1981\Contracts\HashableInterface as BaseHashableInterface;
+
 /**
  * @package Jojo1981\TypedSet
+ * @deprecated use Jojo1981\Contracts\HashableInterface instead (will be removed in 2.0.0)
  */
-interface HashableInterface
+interface HashableInterface extends BaseHashableInterface
 {
-    /**
-     * @return string
-     */
-    public function getHash(): string;
 }
