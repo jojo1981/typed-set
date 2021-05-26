@@ -9,6 +9,7 @@
  */
 namespace Jojo1981\TypedSet;
 
+use Jojo1981\Contracts\HashableInterface as ContractsHashableInterface;
 use Jojo1981\PhpTypes\AbstractType;
 use Jojo1981\PhpTypes\ClassType;
 use Jojo1981\PhpTypes\Exception\TypeException;
@@ -358,7 +359,7 @@ class Set implements \Countable, \IteratorAggregate
     {
         if (\is_object($element)) {
             if ($this->type instanceof ClassType) {
-                if ($element instanceof HashableInterface) {
+                if ($element instanceof ContractsHashableInterface) {
                     return $element->getHash();
                 }
 
