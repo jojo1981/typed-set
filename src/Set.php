@@ -226,7 +226,6 @@ class Set implements \Countable, \IteratorAggregate
             throw SetException::typeOmittedOnEmptySet();
         }
 
-        $typeObject = null;
         if (null !== $type) {
             static::assertGivenType($type);
             $typeObject = self::createTypeFromName($type);
@@ -249,6 +248,32 @@ class Set implements \Countable, \IteratorAggregate
         }
 
         return new Set($typeObject->getName(), $newElements);
+    }
+
+    /**
+     * @return mixed
+     * @throws SetException
+     */
+    public function popElement()
+    {
+        if ($this->isEmpty()) {
+            throw SetException::setIsEmpty('Could not pop an element of the end of of the set.');
+        }
+
+        return \array_pop($this->elements);
+    }
+
+    /**
+     * @return mixed
+     * @throws SetException
+     */
+    public function shiftElement()
+    {
+        if ($this->isEmpty()) {
+            throw SetException::setIsEmpty('Could not shift an element of the beginning of the set.');
+        }
+
+        return \array_shift($this->elements);
     }
 
     /**

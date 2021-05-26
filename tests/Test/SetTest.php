@@ -43,14 +43,14 @@ class SetTest extends TestCase
         $date3 = new \DateTime('now');
 
         $set1 = (new Set(\DateTimeInterface::class, [$date1, $date2, $date3, $date1]));
-        $this->assertEquals(3, $set1->count());
-        $this->assertEquals([$date1, $date2, $date3], $set1->toArray());
+        self::assertEquals(3, $set1->count());
+        self::assertEquals([$date1, $date2, $date3], $set1->toArray());
 
         GlobalHandler::getInstance()->addDefaultHandlers();
 
         $set2 = (new Set(\DateTimeInterface::class, [$date1, $date2, $date3, $date1]));
-        $this->assertEquals(2, $set2->count());
-        $this->assertEquals([$date1, $date3], $set2->toArray());
+        self::assertEquals(2, $set2->count());
+        self::assertEquals([$date1, $date3], $set2->toArray());
     }
 
     /**
@@ -64,12 +64,12 @@ class SetTest extends TestCase
     public function testWithCustomHandler(): void
     {
         $set1 = new Set('string', ['text1', 'text2']);
-        $this->assertEquals(2, $set1->count());
+        self::assertEquals(2, $set1->count());
 
         GlobalHandler::getInstance()->registerHandler(new StringHandler());
 
         $set2 = new Set('string', ['text1', 'text2']);
-        $this->assertEquals(1, $set2->count());
+        self::assertEquals(1, $set2->count());
     }
 
     /**
@@ -85,7 +85,7 @@ class SetTest extends TestCase
      */
     public function testIgnoringDuplicates(string $type, array $elements, array $expectedArray): void
     {
-        $this->assertEquals($expectedArray, (new Set($type, $elements))->toArray());
+        self::assertEquals($expectedArray, (new Set($type, $elements))->toArray());
     }
 
     /**
@@ -167,9 +167,9 @@ class SetTest extends TestCase
     public function testAddWithNewElement(): void
     {
         $set = new Set('string', ['text1']);
-        $this->assertCount(1, $set);
+        self::assertCount(1, $set);
         $set->add('text2');
-        $this->assertCount(2, $set);
+        self::assertCount(2, $set);
     }
 
     /**
@@ -182,9 +182,9 @@ class SetTest extends TestCase
     public function testAddWithExistingElement(): void
     {
         $set = new Set('string', ['text1']);
-        $this->assertCount(1, $set);
+        self::assertCount(1, $set);
         $set->add('text1');
-        $this->assertCount(1, $set);
+        self::assertCount(1, $set);
     }
 
     /**
@@ -213,9 +213,9 @@ class SetTest extends TestCase
     public function testAddAllWithOnlyNewElements(): void
     {
         $set = new Set('string', ['text1']);
-        $this->assertCount(1, $set);
+        self::assertCount(1, $set);
         $set->addAll(['text2', 'text3']);
-        $this->assertCount(3, $set);
+        self::assertCount(3, $set);
     }
 
     /**
@@ -228,9 +228,9 @@ class SetTest extends TestCase
     public function testAddAllWithSomeExistingElements(): void
     {
         $set = new Set('string', ['text1', 'text4']);
-        $this->assertCount(2, $set);
+        self::assertCount(2, $set);
         $set->addAll(['text2', 'text3', 'text5', 'text4']);
-        $this->assertCount(5, $set);
+        self::assertCount(5, $set);
     }
 
     /**
@@ -261,7 +261,7 @@ class SetTest extends TestCase
         $existingValue = new \stdClass();
         $notExistingValue = new TestEntityBase();
         $set = (new Set('object', [$existingValue]));
-        $this->assertFalse($set->contains($notExistingValue));
+        self::assertFalse($set->contains($notExistingValue));
     }
 
     /**
@@ -275,7 +275,7 @@ class SetTest extends TestCase
     {
         $existingValue = new \stdClass();
         $set = (new Set('object', [$existingValue]));
-        $this->assertTrue($set->contains($existingValue));
+        self::assertTrue($set->contains($existingValue));
     }
 
     /**
@@ -290,11 +290,11 @@ class SetTest extends TestCase
         $callable2 = static function () {};
 
         $set = (new Set('callable', [$callable1, $callable2, $callable1]));
-        $this->assertEquals(2, $set->count());
-        $this->assertTrue($set->contains($callable2));
+        self::assertEquals(2, $set->count());
+        self::assertTrue($set->contains($callable2));
         $set->remove($callable2);
-        $this->assertFalse($set->contains($callable2));
-        $this->assertEquals(1, $set->count());
+        self::assertFalse($set->contains($callable2));
+        self::assertEquals(1, $set->count());
     }
 
     /**
@@ -306,9 +306,9 @@ class SetTest extends TestCase
     public function testClear(): void
     {
         $set = (new Set('string', ['text']));
-        $this->assertFalse($set->isEmpty());
+        self::assertFalse($set->isEmpty());
         $set->clear();
-        $this->assertTrue($set->isEmpty());
+        self::assertTrue($set->isEmpty());
     }
 
     /**
@@ -319,8 +319,8 @@ class SetTest extends TestCase
      */
     public function testIsEmpty(): void
     {
-        $this->assertTrue((new Set('string'))->isEmpty());
-        $this->assertFalse((new Set('string', ['text']))->isEmpty());
+        self::assertTrue((new Set('string'))->isEmpty());
+        self::assertFalse((new Set('string', ['text']))->isEmpty());
     }
 
     /**
@@ -331,8 +331,8 @@ class SetTest extends TestCase
      */
     public function testIsNonEmpty(): void
     {
-        $this->assertTrue((new Set('string', ['text']))->isNonEmpty());
-        $this->assertFalse((new Set('string'))->isNonEmpty());
+        self::assertTrue((new Set('string', ['text']))->isNonEmpty());
+        self::assertFalse((new Set('string'))->isNonEmpty());
     }
 
     /**
@@ -343,9 +343,9 @@ class SetTest extends TestCase
      */
     public function testToArray(): void
     {
-        $this->assertEquals([], (new Set('string'))->toArray());
-        $this->assertEquals(['text'], (new Set('string', ['text']))->toArray());
-        $this->assertEquals(['text1', 'text2'], (new Set('string', ['text1', 'text2']))->toArray());
+        self::assertEquals([], (new Set('string'))->toArray());
+        self::assertEquals(['text'], (new Set('string', ['text']))->toArray());
+        self::assertEquals(['text1', 'text2'], (new Set('string', ['text1', 'text2']))->toArray());
     }
 
     /**
@@ -360,7 +360,7 @@ class SetTest extends TestCase
      */
     public function testGetType(string $type, string $expectedType): void
     {
-        $this->assertEquals($expectedType, (new Set($type))->getType());
+        self::assertEquals($expectedType, (new Set($type))->getType());
     }
 
     /**
@@ -376,7 +376,7 @@ class SetTest extends TestCase
      */
     public function testIsEqualType(string $type, TypeInterface $otherType, bool $expectedResult): void
     {
-        $this->assertEquals($expectedResult, (new Set($type))->isEqualType($otherType));
+        self::assertEquals($expectedResult, (new Set($type))->isEqualType($otherType));
     }
 
     /**
@@ -393,7 +393,7 @@ class SetTest extends TestCase
      */
     public function testIsEqual(Set $setA, Set $setB, bool $expectedResult): void
     {
-        $this->assertEquals($expectedResult, $setA->isEqual($setB));
+        self::assertEquals($expectedResult, $setA->isEqual($setB));
     }
 
     /**
@@ -419,7 +419,7 @@ class SetTest extends TestCase
      */
     public function testCompare(Set $setA, Set $setB, DifferenceResult $expectedResult): void
     {
-        $this->assertEquals($expectedResult, $setA->compare($setB));
+        self::assertEquals($expectedResult, $setA->compare($setB));
     }
 
     /**
@@ -498,9 +498,9 @@ class SetTest extends TestCase
     public function testMapWithValidTypeAndEmptySetShouldReturnNewMappedSet(): void
     {
         $set1 = new Set('text');
-        $this->assertEquals('string', $set1->getType());
+        self::assertEquals('string', $set1->getType());
         $set2 = $set1->map(static function () {}, 'integer');
-        $this->assertEquals('int', $set2->getType());
+        self::assertEquals('int', $set2->getType());
     }
 
     /**
@@ -512,18 +512,18 @@ class SetTest extends TestCase
     public function testMapWithValidTypeAndNonEmptySetShouldReturnNewMappedSet(): void
     {
         $originalSet = new Set('text', ['text2', 'text1', 'text3']);
-        $this->assertEquals('string', $originalSet->getType());
-        $this->assertCount(3, $originalSet);
-        $this->assertEquals(['text2', 'text1', 'text3'], $originalSet->toArray());
+        self::assertEquals('string', $originalSet->getType());
+        self::assertCount(3, $originalSet);
+        self::assertEquals(['text2', 'text1', 'text3'], $originalSet->toArray());
 
         $mapper = static function (string $text): int {
             return (int) \substr($text, -1);
         };
 
         $newMappedSet = $originalSet->map($mapper, 'integer');
-        $this->assertEquals('int', $newMappedSet->getType());
-        $this->assertCount(3, $newMappedSet);
-        $this->assertEquals([2, 1, 3], $newMappedSet->toArray());
+        self::assertEquals('int', $newMappedSet->getType());
+        self::assertCount(3, $newMappedSet);
+        self::assertEquals([2, 1, 3], $newMappedSet->toArray());
     }
 
     /**
@@ -535,18 +535,18 @@ class SetTest extends TestCase
     public function testMapWithoutTypeAndNonEmptySetShouldReturnNewMappedSet(): void
     {
         $originalSet = new Set('text', ['text2', 'text1', 'text3']);
-        $this->assertEquals('string', $originalSet->getType());
-        $this->assertCount(3, $originalSet);
-        $this->assertEquals(['text2', 'text1', 'text3'], $originalSet->toArray());
+        self::assertEquals('string', $originalSet->getType());
+        self::assertCount(3, $originalSet);
+        self::assertEquals(['text2', 'text1', 'text3'], $originalSet->toArray());
 
         $mapper = static function (string $text): int {
             return (int) \substr($text, -1);
         };
 
         $newMappedSet = $originalSet->map($mapper);
-        $this->assertEquals('int', $newMappedSet->getType());
-        $this->assertCount(3, $newMappedSet);
-        $this->assertEquals([2, 1, 3], $newMappedSet->toArray());
+        self::assertEquals('int', $newMappedSet->getType());
+        self::assertCount(3, $newMappedSet);
+        self::assertEquals([2, 1, 3], $newMappedSet->toArray());
     }
 
     /**
@@ -558,9 +558,9 @@ class SetTest extends TestCase
     public function testFilterEmptySet(): void
     {
         $originalSet = new Set('string');
-        $this->assertCount(0, $originalSet);
+        self::assertCount(0, $originalSet);
         $filteredSet = $originalSet->filter(static function () {});
-        $this->assertCount(0, $filteredSet);
+        self::assertCount(0, $filteredSet);
     }
 
     /**
@@ -572,11 +572,11 @@ class SetTest extends TestCase
     public function testFilter(): void
     {
         $originalSet = new Set('string', ['text1', 'text2', 'text3']);
-        $this->assertEquals(['text1', 'text2', 'text3'], $originalSet->toArray());
+        self::assertEquals(['text1', 'text2', 'text3'], $originalSet->toArray());
         $filteredSet = $originalSet->filter(static function (string $item): bool {
             return 'text2' !== $item;
         });
-        $this->assertEquals(['text1', 'text3'], $filteredSet->toArray());
+        self::assertEquals(['text1', 'text3'], $filteredSet->toArray());
     }
 
     /**
@@ -588,7 +588,7 @@ class SetTest extends TestCase
     public function testFindEmptySet(): void
     {
         $set = new Set('string');
-        $this->assertNull($set->find(static function () {}));
+        self::assertNull($set->find(static function () {}));
     }
 
     /**
@@ -600,12 +600,12 @@ class SetTest extends TestCase
     public function testFind(): void
     {
         $set = new Set('string', ['text1', 'text2', 'text3']);
-        $this->assertNull($set->find(
+        self::assertNull($set->find(
             static function (): bool {
                 return false;
             }
         ));
-        $this->assertEquals(
+        self::assertEquals(
             'text2',
             $set->find(
                 static function (string $item): bool {
@@ -623,7 +623,7 @@ class SetTest extends TestCase
      */
     public function testAllEmptySet(): void
     {
-        $this->assertTrue((new Set('int'))->all(static function () {}));
+        self::assertTrue((new Set('int'))->all(static function () {}));
     }
 
     /**
@@ -635,13 +635,13 @@ class SetTest extends TestCase
     public function testAll(): void
     {
         $set = new Set('string', ['text1', 'text2', 'text3']);
-        $this->assertFalse($set->all(static function (): bool {
+        self::assertFalse($set->all(static function (): bool {
             return false;
         }));
-        $this->assertFalse($set->all(static function (string $item): bool {
+        self::assertFalse($set->all(static function (string $item): bool {
             return 'text2' === $item;
         }));
-        $this->assertTrue($set->all(static function (): bool {
+        self::assertTrue($set->all(static function (): bool {
             return true;
         }));
     }
@@ -654,7 +654,7 @@ class SetTest extends TestCase
      */
     public function testSomeEmptySet(): void
     {
-        $this->assertFalse((new Set('int'))->some(static function () {}));
+        self::assertFalse((new Set('int'))->some(static function () {}));
     }
 
     /**
@@ -666,10 +666,10 @@ class SetTest extends TestCase
     public function testSome(): void
     {
         $set = new Set('string', ['text1', 'text2', 'text3']);
-        $this->assertFalse($set->some(static function (): bool {
+        self::assertFalse($set->some(static function (): bool {
             return false;
         }));
-        $this->assertTrue($set->some(static function (string $item): bool {
+        self::assertTrue($set->some(static function (string $item): bool {
             return 'text2' === $item;
         }));
     }
@@ -682,7 +682,7 @@ class SetTest extends TestCase
      */
     public function testNoneEmptySet(): void
     {
-        $this->assertTrue((new Set('int'))->none(static function () {}));
+        self::assertTrue((new Set('int'))->none(static function () {}));
     }
 
     /**
@@ -694,10 +694,10 @@ class SetTest extends TestCase
     public function testNone(): void
     {
         $set = new Set('string', ['text1', 'text2', 'text3']);
-        $this->assertTrue($set->none(static function (): bool {
+        self::assertTrue($set->none(static function (): bool {
             return false;
         }));
-        $this->assertFalse($set->none(static function (string $item): bool {
+        self::assertFalse($set->none(static function (string $item): bool {
             return 'text2' === $item;
         }));
     }
@@ -710,11 +710,11 @@ class SetTest extends TestCase
      */
     public function testCount(): void
     {
-        $this->assertCount(0, new Set('string'));
-        $this->assertCount(1, new Set('int', [1]));
-        $this->assertCount(1, new Set('int', [1, 1]));
-        $this->assertCount(2, new Set('int', [1, 2]));
-        $this->assertCount(3, new Set('int', [1, 2, 3]));
+        self::assertCount(0, new Set('string'));
+        self::assertCount(1, new Set('int', [1]));
+        self::assertCount(1, new Set('int', [1, 1]));
+        self::assertCount(2, new Set('int', [1, 2]));
+        self::assertCount(3, new Set('int', [1, 2, 3]));
     }
 
     /**
@@ -725,10 +725,10 @@ class SetTest extends TestCase
      */
     public function testGetIterator(): void
     {
-        $this->assertInstanceOf(\Traversable::class, (new Set('int', [1, 2, 3]))->getIterator());
+        self::assertInstanceOf(\Traversable::class, (new Set('int', [1, 2, 3]))->getIterator());
         $expectedValues = [1, 2, 3];
         foreach (new Set('int', [1, 2, 3]) as $index => $item) {
-            $this->assertEquals($expectedValues[$index], $item);
+            self::assertEquals($expectedValues[$index], $item);
         }
     }
 
@@ -751,9 +751,9 @@ class SetTest extends TestCase
     public function testCreateFromElements(): void
     {
         $set = Set::createFromElements([1, 2, 3]);
-        $this->assertEquals('int', $set->getType());
-        $this->assertCount(3, $set);
-        $this->assertEquals([1,2,3], $set->toArray());
+        self::assertEquals('int', $set->getType());
+        self::assertCount(3, $set);
+        self::assertEquals([1,2,3], $set->toArray());
     }
 
     /**
@@ -770,6 +770,6 @@ class SetTest extends TestCase
         $item4 = new TestHashableEntity2('name');
 
         $set = new Set('object', [$item1, $item2, $item3, $item4]);
-        $this->assertCount(4, $set);
+        self::assertCount(4, $set);
     }
 }

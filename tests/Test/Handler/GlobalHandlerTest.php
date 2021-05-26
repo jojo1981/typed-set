@@ -20,8 +20,8 @@ use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
- * @runTestsInSeparateProcesses
- *
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
  * @package Jojo1981\TypedSet\TestSuite\Test\Handler
  */
 class GlobalHandlerTest extends TestCase
@@ -33,7 +33,7 @@ class GlobalHandlerTest extends TestCase
      */
     public function testIsSingleTon(): void
     {
-        $this->assertSame(GlobalHandler::getInstance(), GlobalHandler::getInstance());
+        self::assertSame(GlobalHandler::getInstance(), GlobalHandler::getInstance());
     }
 
     /**
@@ -46,9 +46,9 @@ class GlobalHandlerTest extends TestCase
     {
         $element = new \DateTime();
         $type = AbstractType::createFromTypeName(\DateTimeInterface::class);
-        $this->assertFalse(GlobalHandler::getInstance()->support($element, $type));
+        self::assertFalse(GlobalHandler::getInstance()->support($element, $type));
         GlobalHandler::getInstance()->addDefaultHandlers();
-        $this->assertTrue(GlobalHandler::getInstance()->support($element, $type));
+        self::assertTrue(GlobalHandler::getInstance()->support($element, $type));
     }
 
     /**
@@ -63,12 +63,14 @@ class GlobalHandlerTest extends TestCase
         $element = new Person('John Doe', 42);
         $type = AbstractType::createFromTypeName(Person::class);
 
-        $this->assertFalse(GlobalHandler::getInstance()->support($element, $type));
+        self::assertFalse(GlobalHandler::getInstance()->support($element, $type));
         GlobalHandler::getInstance()->registerHandler($handler);
-        $this->assertTrue(GlobalHandler::getInstance()->support($element, $type));
+        self::assertTrue(GlobalHandler::getInstance()->support($element, $type));
     }
 
     /**
+     * @runInSeparateProcess
+     *
      * @throws TypeException
      * @throws HandlerException
      * @return void
@@ -96,7 +98,7 @@ class GlobalHandlerTest extends TestCase
         $element = new Person('John Doe', 42);
         $type = AbstractType::createFromTypeName(Person::class);
         GlobalHandler::getInstance()->registerHandler($handler);
-        $this->assertEquals(
+        self::assertEquals(
             'John Doe|42',
             GlobalHandler::getInstance()->getHash($element, $type)
         );

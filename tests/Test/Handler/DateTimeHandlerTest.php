@@ -43,10 +43,10 @@ class DateTimeHandlerTest extends TestCase
      */
     public function testSupport(): void
     {
-        $this->assertTrue($this->handler->support(new \DateTime(), AbstractType::createFromTypeName(\DateTimeInterface::class)));
-        $this->assertTrue($this->handler->support(new \DateTimeImmutable(), AbstractType::createFromTypeName(\DateTimeInterface::class)));
-        $this->assertFalse($this->handler->support(new \stdClass(), AbstractType::createFromTypeName(\stdClass::class)));
-        $this->assertFalse($this->handler->support(new TestEntity(), AbstractType::createFromTypeName(InterfaceTestEntity::class)));
+        self::assertTrue($this->handler->support(new \DateTime(), AbstractType::createFromTypeName(\DateTimeInterface::class)));
+        self::assertTrue($this->handler->support(new \DateTimeImmutable(), AbstractType::createFromTypeName(\DateTimeInterface::class)));
+        self::assertFalse($this->handler->support(new \stdClass(), AbstractType::createFromTypeName(\stdClass::class)));
+        self::assertFalse($this->handler->support(new TestEntity(), AbstractType::createFromTypeName(InterfaceTestEntity::class)));
     }
 
     /**
@@ -74,6 +74,6 @@ class DateTimeHandlerTest extends TestCase
         $element = new \DateTime('@1578591640');
         $expectedHash = 'cd5df504da36cca8e34fdb62b27d870051b7cd87175c149fffa9ccbb9d06284a';
         $actualHash = $this->handler->getHash($element, AbstractType::createFromTypeName(\DateTimeInterface::class));
-        $this->assertEquals($expectedHash, $actualHash);
+        self::assertEquals($expectedHash, $actualHash);
     }
 }

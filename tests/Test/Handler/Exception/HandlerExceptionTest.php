@@ -30,7 +30,7 @@ class HandlerExceptionTest extends TestCase
     public function testCanNotHandleElementWithoutTypes(): void
     {
         $exception = HandlerException::canNotHandleElement();
-        $this->assertEquals('Can not handle element', $exception->getMessage());
+        self::assertEquals('Can not handle element', $exception->getMessage());
     }
 
     /**
@@ -42,7 +42,7 @@ class HandlerExceptionTest extends TestCase
     public function testCanNotHandleElementOnlyWithActualType(): void
     {
         $exception = HandlerException::canNotHandleElement(null, AbstractType::createFromTypeName('string'));
-        $this->assertEquals('Can not handle element', $exception->getMessage());
+        self::assertEquals('Can not handle element', $exception->getMessage());
     }
 
     /**
@@ -54,13 +54,13 @@ class HandlerExceptionTest extends TestCase
     public function testCanNotHandleElementOnlyWithExpectedType(): void
     {
         $exception1 = HandlerException::canNotHandleElement(AbstractType::createFromTypeName('string'), null);
-        $this->assertEquals(
+        self::assertEquals(
             'Can not handle element, element not of type: `string`',
             $exception1->getMessage()
         );
 
         $exception2 = HandlerException::canNotHandleElement(AbstractType::createFromTypeName(\stdClass::class), null);
-        $this->assertEquals(
+        self::assertEquals(
             'Can not handle element, element not an instance of: `\stdClass`',
             $exception2->getMessage()
         );
@@ -83,7 +83,7 @@ class HandlerExceptionTest extends TestCase
     ): void
     {
         $exception = HandlerException::canNotHandleElement($expectedType, $actualType);
-        $this->assertEquals($expectedMessage, $exception->getMessage());
+        self::assertEquals($expectedMessage, $exception->getMessage());
     }
 
     /**
@@ -94,7 +94,7 @@ class HandlerExceptionTest extends TestCase
     public function testCanNotHandleElementBecauseNoHandlerAvailable(): void
     {
         $exception = HandlerException::canNotHandleElementBecauseNoHandlerAvailable();
-        $this->assertEquals(
+        self::assertEquals(
             'Can not handle the element, because there is no handler registered which support this element',
             $exception->getMessage()
         );

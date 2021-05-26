@@ -28,7 +28,7 @@ class SetExceptionTest extends TestCase
     public function testCanNotCompareSetsOfDifferenceType(): void
     {
         $exception = SetException::canNotCompareSetsOfDifferenceType();
-        $this->assertEquals('Can not compare 2 sets of different types', $exception->getMessage());
+        self::assertEquals('Can not compare 2 sets of different types', $exception->getMessage());
     }
 
     /**
@@ -50,7 +50,7 @@ class SetExceptionTest extends TestCase
     ): void
     {
         $exception = SetException::dataIsNotOfExpectedType($expectedType, $actualType, $prefixMessage);
-        $this->assertEquals($expectedMessage, $exception->getMessage());
+        self::assertEquals($expectedMessage, $exception->getMessage());
     }
 
     /**
@@ -62,11 +62,11 @@ class SetExceptionTest extends TestCase
     {
         $previous = new \Exception('Previous exception');
         $exception = SetException::givenTypeIsNotValid('invalidType', $previous);
-        $this->assertEquals(
+        self::assertEquals(
             'Given type: `invalidType` is not a valid type and also not an existing class',
             $exception->getMessage()
         );
-        $this->assertSame($previous, $exception->getPrevious());
+        self::assertSame($previous, $exception->getPrevious());
     }
 
     /**
@@ -78,11 +78,11 @@ class SetExceptionTest extends TestCase
     {
         $previous = new \Exception('Previous exception');
         $exception = SetException::determinedTypeIsNotValid('null', $previous);
-        $this->assertEquals(
+        self::assertEquals(
             'Determined type: `null` is not a valid type and also not an existing class',
             $exception->getMessage()
         );
-        $this->assertSame($previous, $exception->getPrevious());
+        self::assertSame($previous, $exception->getPrevious());
     }
 
     /**
@@ -93,7 +93,7 @@ class SetExceptionTest extends TestCase
     public function testEmptyElementsCanNotDetermineTypeShouldReturnSetException(): void
     {
         $exception = SetException::emptyElementsCanNotDetermineType();
-        $this->assertEquals(
+        self::assertEquals(
             'Elements can not be empty, because type can NOT be determined',
             $exception->getMessage()
         );
@@ -107,7 +107,7 @@ class SetExceptionTest extends TestCase
     public function testTypeOmittedOnEmptySetShouldReturnSetException(): void
     {
         $exception = SetException::typeOmittedOnEmptySet();
-        $this->assertEquals('Type can not be omitted on an empty Set', $exception->getMessage());
+        self::assertEquals('Type can not be omitted on an empty Set', $exception->getMessage());
     }
 
     /**
@@ -119,11 +119,11 @@ class SetExceptionTest extends TestCase
     {
         $previous = new \Exception('Previous exception');
         $exception = SetException::couldNotCreateTypeFromValue($previous);
-        $this->assertEquals(
+        self::assertEquals(
             'Could not create type from value',
             $exception->getMessage()
         );
-        $this->assertSame($previous, $exception->getPrevious());
+        self::assertSame($previous, $exception->getPrevious());
     }
 
     /**
@@ -135,10 +135,10 @@ class SetExceptionTest extends TestCase
     {
         $previous = new \Exception('Previous exception');
         $exception = SetException::couldNotCreateTypeFromTypeName('null', $previous);
-        $this->assertEquals(
+        self::assertEquals(
             'Could not create type from type name: `null`',
             $exception->getMessage()
         );
-        $this->assertSame($previous, $exception->getPrevious());
+        self::assertSame($previous, $exception->getPrevious());
     }
 }

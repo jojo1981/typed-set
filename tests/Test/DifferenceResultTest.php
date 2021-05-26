@@ -33,9 +33,9 @@ class DifferenceResultTest extends TestCase
         $areEqual = true;
 
         $differenceResult = new DifferenceResult($lhs, $rhs, $same, $areEqual);
-        $this->assertSame($lhs, $differenceResult->getLhs());
-        $this->assertSame($rhs, $differenceResult->getRhs());
-        $this->assertSame($same, $differenceResult->getSame());
-        $this->assertEquals($areEqual, $differenceResult->areEqual());
+        self::assertSame($lhs, $differenceResult->getLhs());
+        self::assertSame($rhs, $differenceResult->getRhs());
+        self::assertSame($same, $differenceResult->getSame());
+        self::assertEquals($areEqual, $differenceResult->areEqual());
     }
 }

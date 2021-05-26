@@ -112,4 +112,13 @@ class SetException extends \DomainException
             $previous
         );
     }
+
+    /**
+     * @param string $message
+     * @return SetException
+     */
+    public static function setIsEmpty(string $message): SetException
+    {
+        return new self('Set is empty. ' . $message);
+    }
 }

@@ -28,8 +28,8 @@ class DifferenceTest extends TestCase
     {
         $missingElements = ['item1', 'item2', 'item3'];
         $difference = new Difference($missingElements, []);
-        $this->assertSame($missingElements, $difference->getMissingElements());
-        $this->assertEquals([], $difference->getExtraElements());
+        self::assertSame($missingElements, $difference->getMissingElements());
+        self::assertEquals([], $difference->getExtraElements());
     }
 
     /**
@@ -41,7 +41,7 @@ class DifferenceTest extends TestCase
     {
         $extraElements = ['item1', 'item2', 'item3'];
         $difference = new Difference([], $extraElements);
-        $this->assertSame($extraElements, $difference->getExtraElements());
-        $this->assertEquals([], $difference->getMissingElements());
+        self::assertSame($extraElements, $difference->getExtraElements());
+        self::assertEquals([], $difference->getMissingElements());
     }
 }

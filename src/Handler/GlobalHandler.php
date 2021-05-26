@@ -37,7 +37,7 @@ final class GlobalHandler implements HandlerInterface
     public static function getInstance(): GlobalHandler
     {
         static $handler;
-        if (!$handler) {
+        if (!isset($handler)) {
             $handler = new self();
         }
 
