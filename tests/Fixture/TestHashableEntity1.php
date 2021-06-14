@@ -9,7 +9,7 @@
  */
 namespace Jojo1981\TypedSet\TestSuite\Fixture;
 
-use Jojo1981\TypedSet\HashableInterface;
+use Jojo1981\Contracts\HashableInterface;
 
 /**
  * @package Jojo1981\TypedSet\TestSuite\Fixture

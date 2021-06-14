@@ -550,6 +550,55 @@ class SetTest extends TestCase
     }
 
     /**
+     * @return void
+     * @throws InvalidArgumentException
+     * @throws SetException
+     * @throws ExpectationFailedException
+     */
+    public function testMapWithoutGivenTypeShouldCallMapperWithRightArguments(): void
+    {
+        $set = new Set(TestHashableEntity2::class, [new TestHashableEntity2('name1'), new TestHashableEntity2('name2')]);
+
+        $expectedPosition = 0;
+        $called = false;
+        $mapper = static function (TestHashableEntity2 $testHashableEntity2, $actualPosition, $actualId) use (&$expectedPosition, &$called): string {
+            $expectedId = $testHashableEntity2->getHash();
+            if (!$called) {
+                self::assertEquals(0, $actualPosition);
+                $called = true;
+            } else {
+                self::assertEquals($expectedPosition++, $actualPosition);
+            }
+            self::assertEquals($expectedId, $actualId);
+
+            return $testHashableEntity2->getHash();
+        };
+        $set->map($mapper);
+    }
+
+    /**
+     * @return void
+     * @throws InvalidArgumentException
+     * @throws SetException
+     * @throws ExpectationFailedException
+     */
+    public function testMapWithGivenTypeShouldCallMapperWithRightArguments(): void
+    {
+        $set = new Set(TestHashableEntity2::class, [new TestHashableEntity2('name1'), new TestHashableEntity2('name2')]);
+
+        $expectedPosition = 0;
+        $mapper = static function (TestHashableEntity2 $testHashableEntity2, $actualPosition, $actualId) use (&$expectedPosition): string {
+            $expectedId = $testHashableEntity2->getHash();
+            self::assertEquals($expectedPosition++, $actualPosition);
+            self::assertEquals($expectedId, $actualId);
+
+            return $testHashableEntity2->getHash();
+
+        };
+        $set->map($mapper, 'string');
+    }
+
+    /**
      * @throws InvalidArgumentException
      * @throws SetException
      * @throws ExpectationFailedException

@@ -230,13 +230,14 @@ class Set implements \Countable, \IteratorAggregate
             static::assertGivenType($type);
             $typeObject = self::createTypeFromName($type);
         } else {
-            $typeObject = self::createTypeFromValue($mapper(\reset($this->elements)));
+            $typeObject = self::createTypeFromValue($mapper(\reset($this->elements), 0, \array_key_first($this->elements)));
             self::assertDeterminedType($typeObject->getName());
         }
 
         $newElements = [];
-        foreach ($this->elements as $element) {
-            $newElement = $mapper($element);
+        $position = 0;
+        foreach ($this->elements as $id => $element) {
+            $newElement = $mapper($element, $position++, $id);
             if (!$typeObject->isAssignableValue($newElement)) {
                 throw SetException::dataIsNotOfExpectedType(
                     $typeObject,
