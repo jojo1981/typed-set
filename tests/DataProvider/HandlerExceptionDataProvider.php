@@ -11,16 +11,21 @@ namespace Jojo1981\TypedSet\TestSuite\DataProvider;
 
 use Jojo1981\PhpTypes\AbstractType;
 use Jojo1981\PhpTypes\Exception\TypeException;
+use Jojo1981\PhpTypes\Value\Exception\ValueException;
 use Jojo1981\TypedSet\TestSuite\Fixture\TestEntity;
+use RuntimeException;
+use stdClass;
 
 /**
  * @package Jojo1981\TypedSet\TestSuite\DataProvider
  */
-class HandlerExceptionDataProvider
+final class HandlerExceptionDataProvider
 {
     /**
-     * @throws TypeException
      * @return array[]
+     * @throws ValueException
+     * @throws RuntimeException
+     * @throws TypeException
      */
     public function getTestData(): array
     {
@@ -31,18 +36,18 @@ class HandlerExceptionDataProvider
                 'Can not handle element, element not of type: `string`, but of type: `int`'
             ],
             [
-                AbstractType::createFromTypeName(\stdClass::class),
+                AbstractType::createFromTypeName(stdClass::class),
                 AbstractType::createFromTypeName('number'),
                 'Can not handle element, element not an instance of: `\stdClass`, but of type: `float`'
             ],
             [
                 AbstractType::createFromTypeName('bool'),
-                AbstractType::createFromTypeName(\stdClass::class),
+                AbstractType::createFromTypeName(stdClass::class),
                 'Can not handle element, element not of type: `bool`, but an instance of: `\stdClass`'
             ],
             [
                 AbstractType::createFromTypeName(TestEntity::class),
-                AbstractType::createFromTypeName(\stdClass::class),
+                AbstractType::createFromTypeName(stdClass::class),
                 'Can not handle element, element not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntity`, but an instance of: `\stdClass`'
             ]
         ];

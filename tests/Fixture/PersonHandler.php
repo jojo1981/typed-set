@@ -15,7 +15,7 @@ use Jojo1981\TypedSet\HandlerInterface;
 /**
  * @package Jojo1981\TypedSet\TestSuite\Fixture
  */
-class PersonHandler implements HandlerInterface
+final class PersonHandler implements HandlerInterface
 {
     /**
      * @param mixed $element

@@ -21,7 +21,7 @@ use Jojo1981\PhpTypes\Value\Exception\ValueException;
 /**
  * @package Jojo1981\TypedSet\TestSuite\DataProvider
  */
-class SetExceptionDataProvider
+final class SetExceptionDataProvider
 {
     /**
      * @throws ValueException

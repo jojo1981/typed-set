@@ -12,15 +12,18 @@ namespace Jojo1981\TypedSet\TestSuite\Test\Handler\Exception;
 use Jojo1981\PhpTypes\AbstractType;
 use Jojo1981\PhpTypes\Exception\TypeException;
 use Jojo1981\PhpTypes\TypeInterface;
+use Jojo1981\PhpTypes\Value\Exception\ValueException;
 use Jojo1981\TypedSet\Handler\Exception\HandlerException;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use stdClass;
 
 /**
  * @package Jojo1981\TypedSet\TestSuite\Test\Handler\Exception
  */
-class HandlerExceptionTest extends TestCase
+final class HandlerExceptionTest extends TestCase
 {
     /**
      * @throws InvalidArgumentException
@@ -34,10 +37,12 @@ class HandlerExceptionTest extends TestCase
     }
 
     /**
-     * @throws ExpectationFailedException
-     * @throws TypeException
-     * @throws InvalidArgumentException
      * @return void
+     * @throws InvalidArgumentException
+     * @throws TypeException
+     * @throws ValueException
+     * @throws RuntimeException
+     * @throws ExpectationFailedException
      */
     public function testCanNotHandleElementOnlyWithActualType(): void
     {
@@ -46,20 +51,22 @@ class HandlerExceptionTest extends TestCase
     }
 
     /**
+     * @return void
      * @throws InvalidArgumentException
      * @throws TypeException
+     * @throws ValueException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testCanNotHandleElementOnlyWithExpectedType(): void
     {
-        $exception1 = HandlerException::canNotHandleElement(AbstractType::createFromTypeName('string'), null);
+        $exception1 = HandlerException::canNotHandleElement(AbstractType::createFromTypeName('string'));
         self::assertEquals(
             'Can not handle element, element not of type: `string`',
             $exception1->getMessage()
         );
 
-        $exception2 = HandlerException::canNotHandleElement(AbstractType::createFromTypeName(\stdClass::class), null);
+        $exception2 = HandlerException::canNotHandleElement(AbstractType::createFromTypeName(stdClass::class));
         self::assertEquals(
             'Can not handle element, element not an instance of: `\stdClass`',
             $exception2->getMessage()

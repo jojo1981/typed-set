@@ -12,6 +12,7 @@ namespace Jojo1981\TypedSet\Handler\Exception;
 use Jojo1981\PhpTypes\ClassType;
 use Jojo1981\PhpTypes\TypeInterface;
 use Jojo1981\TypedSet\Exception\SetException;
+use function sprintf;
 
 /**
  * @package Jojo1981\TypedSet\Handler\Exception
@@ -21,26 +22,22 @@ final class HandlerException extends SetException
     /**
      * @param null|TypeInterface $expectedType
      * @param null|TypeInterface $actualType
-     * @return HandlerException
+     * @return self
      */
-    public static function canNotHandleElement(
-        ?TypeInterface $expectedType = null,
-        ?TypeInterface $actualType = null
-    ): HandlerException
+    public static function canNotHandleElement(?TypeInterface $expectedType = null, ?TypeInterface $actualType = null): self
     {
         if (null === $expectedType) {
-            return new static('Can not handle element');
+            return new self('Can not handle element');
         }
-
         if (null === $actualType) {
-            return new static(\sprintf(
+            return new self(sprintf(
                 'Can not handle element, element not %s: `%s`',
                 $expectedType instanceof ClassType ? 'an instance of' : 'of type',
                 $expectedType->getName()
             ));
         }
 
-        return new static(\sprintf(
+        return new self(sprintf(
             'Can not handle element, element not %s: `%s`, but %s: `%s`',
             $expectedType instanceof ClassType ? 'an instance of' : 'of type',
             $expectedType->getName(),
@@ -50,12 +47,10 @@ final class HandlerException extends SetException
     }
 
     /**
-     * @return HandlerException
+     * @return self
      */
-    public static function canNotHandleElementBecauseNoHandlerAvailable(): HandlerException
+    public static function canNotHandleElementBecauseNoHandlerAvailable(): self
     {
-        return new static(
-            'Can not handle the element, because there is no handler registered which support this element'
-        );
+        return new self('Can not handle the element, because there is no handler registered which support this element');
     }
 }

@@ -18,7 +18,7 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
 /**
  * @package Jojo1981\TypedSet\TestSuite\Test
  */
-class DifferenceResultTest extends TestCase
+final class DifferenceResultTest extends TestCase
 {
     /**
      * @throws InvalidArgumentException

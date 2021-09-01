@@ -11,11 +11,12 @@ namespace Jojo1981\TypedSet\TestSuite\Fixture;
 
 use Jojo1981\PhpTypes\TypeInterface;
 use Jojo1981\TypedSet\HandlerInterface;
+use function is_string;
 
 /**
  * @package Jojo1981\TypedSet\TestSuite\Fixture
  */
-class StringHandler implements HandlerInterface
+final class StringHandler implements HandlerInterface
 {
     /**
      * @param mixed $element
@@ -24,7 +25,7 @@ class StringHandler implements HandlerInterface
      */
     public function support($element, TypeInterface $type): bool
     {
-        return \is_string($element);
+        return is_string($element);
     }
 
     /**

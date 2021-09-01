@@ -12,6 +12,7 @@ namespace Jojo1981\TypedSet\Handler;
 use Jojo1981\PhpTypes\TypeInterface;
 use Jojo1981\TypedSet\Handler\Exception\HandlerException;
 use Jojo1981\TypedSet\HandlerInterface;
+use function get_class;
 
 /**
  * A composite and singleton class.
@@ -21,10 +22,10 @@ use Jojo1981\TypedSet\HandlerInterface;
 final class GlobalHandler implements HandlerInterface
 {
     /** @var HandlerInterface[]  */
-    private $handlers = [];
+    private array $handlers = [];
 
     /**
-     * Private constructor to prevent using the keyword `new` and instead use the static method getInstance
+     * Private constructor, prevent getting an instance of this class using the new keyword from outside the lexical scope of this class.
      */
     private function __construct()
     {
@@ -91,6 +92,6 @@ final class GlobalHandler implements HandlerInterface
      */
     public function registerHandler(HandlerInterface $handler): void
     {
-        $this->handlers[\get_class($handler)] = $handler;
+        $this->handlers[get_class($handler)] = $handler;
     }
 }

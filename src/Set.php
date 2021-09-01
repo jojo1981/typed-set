@@ -9,6 +9,10 @@
  */
 namespace Jojo1981\TypedSet;
 
+use ArrayIterator;
+use Countable;
+use Exception;
+use IteratorAggregate;
 use Jojo1981\Contracts\HashableInterface as ContractsHashableInterface;
 use Jojo1981\PhpTypes\AbstractType;
 use Jojo1981\PhpTypes\ClassType;
@@ -17,27 +21,47 @@ use Jojo1981\PhpTypes\TypeInterface;
 use Jojo1981\TypedSet\Exception\SetException;
 use Jojo1981\TypedSet\Handler\Exception\HandlerException;
 use Jojo1981\TypedSet\Handler\GlobalHandler;
+use RuntimeException;
+use Traversable;
+use function array_filter;
+use function array_key_exists;
+use function array_key_first;
+use function array_pop;
+use function array_shift;
+use function array_values;
+use function count;
+use function hash;
+use function in_array;
+use function is_array;
+use function is_object;
+use function json_encode;
+use function reset;
+use function spl_object_hash;
+use function strtolower;
 
 /**
  * A mutable unordered type safe set.
  *
  * @package Jojo1981\TypedSet
+ * @template T
  */
-class Set implements \Countable, \IteratorAggregate
+class Set implements Countable, IteratorAggregate
 {
     /** @var string[] */
     private const NOT_SUPPORTED_TYPES = ['mixed', 'null', 'void', 'bool', 'boolean', 'resource'];
 
     /** @var TypeInterface */
-    private $type;
+    private TypeInterface $type;
 
-    /** @var array */
-    private $elements = [];
+    /** @var T[] */
+    private array $elements = [];
 
     /**
      * @param string $type
-     * @param array $elements
+     * @param T[] $elements
+     * @throws HandlerException
      * @throws SetException
+     * @throws RuntimeException
      */
     public function __construct(string $type, array $elements = [])
     {
@@ -47,7 +71,7 @@ class Set implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @param mixed $element
+     * @param T $element
      * @throws SetException
      * @throws HandlerException
      * @return void
@@ -61,7 +85,7 @@ class Set implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @param array $elements
+     * @param T[] $elements
      * @throws SetException
      * @throws HandlerException
      * @return void
@@ -74,7 +98,7 @@ class Set implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @param mixed $element
+     * @param T $element
      * @throws SetException
      * @throws HandlerException
      * @return bool
@@ -83,11 +107,11 @@ class Set implements \Countable, \IteratorAggregate
     {
         $this->assertElementIsValid($element);
 
-        return \array_key_exists($this->getHashForElement($element), $this->elements);
+        return array_key_exists($this->getHashForElement($element), $this->elements);
     }
 
     /**
-     * @param mixed $element
+     * @param T $element
      * @throws SetException
      * @return void
      */
@@ -128,7 +152,7 @@ class Set implements \Countable, \IteratorAggregate
      */
     public function toArray(): array
     {
-        return \array_values($this->elements);
+        return array_values($this->elements);
     }
 
     /**
@@ -217,8 +241,9 @@ class Set implements \Countable, \IteratorAggregate
      *
      * @param callable $mapper
      * @param null|string $type
-     * @throws SetException
      * @return Set
+     * @throws RuntimeException
+     * @throws SetException
      */
     public function map(callable $mapper, ?string $type = null): Set
     {
@@ -230,7 +255,7 @@ class Set implements \Countable, \IteratorAggregate
             static::assertGivenType($type);
             $typeObject = self::createTypeFromName($type);
         } else {
-            $typeObject = self::createTypeFromValue($mapper(\reset($this->elements), 0, \array_key_first($this->elements)));
+            $typeObject = self::createTypeFromValue($mapper(reset($this->elements), 0, array_key_first($this->elements)));
             self::assertDeterminedType($typeObject->getName());
         }
 
@@ -261,7 +286,7 @@ class Set implements \Countable, \IteratorAggregate
             throw SetException::setIsEmpty('Could not pop an element of the end of of the set.');
         }
 
-        return \array_pop($this->elements);
+        return array_pop($this->elements);
     }
 
     /**
@@ -274,7 +299,7 @@ class Set implements \Countable, \IteratorAggregate
             throw SetException::setIsEmpty('Could not shift an element of the beginning of the set.');
         }
 
-        return \array_shift($this->elements);
+        return array_shift($this->elements);
     }
 
     /**
@@ -284,12 +309,12 @@ class Set implements \Countable, \IteratorAggregate
      */
     public function filter(callable $predicate): Set
     {
-        return new Set($this->type->getName(), \array_filter($this->elements, $predicate));
+        return new Set($this->type->getName(), array_filter($this->elements, $predicate));
     }
 
     /**
      * @param callable $predicate
-     * @return mixed
+     * @return T|null
      */
     public function find(callable $predicate)
     {
@@ -352,21 +377,22 @@ class Set implements \Countable, \IteratorAggregate
      */
     public function count(): int
     {
-        return \count($this->elements);
+        return count($this->elements);
     }
 
     /**
-     * @return \Traversable
+     * @return Traversable
      */
-    public function getIterator(): \Traversable
+    public function getIterator(): Traversable
     {
-        return new \ArrayIterator($this->toArray());
+        return new ArrayIterator($this->toArray());
     }
 
     /**
      * @param mixed $element
-     * @throws SetException
      * @return void
+     * @throws RuntimeException
+     * @throws SetException
      */
     private function assertElementIsValid($element): void
     {
@@ -383,7 +409,7 @@ class Set implements \Countable, \IteratorAggregate
      */
     private function getHashForElement($element): string
     {
-        if (\is_object($element)) {
+        if (is_object($element)) {
             if ($this->type instanceof ClassType) {
                 if ($element instanceof ContractsHashableInterface) {
                     return $element->getHash();
@@ -394,24 +420,25 @@ class Set implements \Countable, \IteratorAggregate
                 }
             }
 
-            return \spl_object_hash($element);
+            return spl_object_hash($element);
         }
 
         if (GlobalHandler::getInstance()->support($element, $this->type)) {
             return GlobalHandler::getInstance()->getHash($element, $this->type);
         }
 
-        if (\is_array($element)) {
-            return \hash('sha256', \json_encode($element));
+        if (is_array($element)) {
+            return hash('sha256', json_encode($element));
         }
 
         return (string) $element;
     }
 
     /**
-     * @param array $elements
-     * @throws SetException
+     * @param T[] $elements
      * @return Set
+     * @throws RuntimeException
+     * @throws SetException
      */
     public static function createFromElements(array $elements): Set
     {
@@ -419,7 +446,7 @@ class Set implements \Countable, \IteratorAggregate
             throw SetException::emptyElementsCanNotDetermineType();
         }
 
-        return new self((self::createTypeFromValue(\reset($elements)))->getName(), $elements);
+        return new self((self::createTypeFromValue(reset($elements)))->getName(), $elements);
     }
 
     /**
@@ -429,13 +456,13 @@ class Set implements \Countable, \IteratorAggregate
      */
     private static function assertGivenType(string $type): void
     {
-        if (\in_array(\strtolower($type), self::NOT_SUPPORTED_TYPES)) {
+        if (in_array(strtolower($type), self::NOT_SUPPORTED_TYPES)) {
             throw SetException::givenTypeIsNotValid($type);
         }
 
         try {
             self::createTypeFromName($type);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw SetException::givenTypeIsNotValid($type, $exception);
         }
     }
@@ -447,21 +474,22 @@ class Set implements \Countable, \IteratorAggregate
      */
     private static function assertDeterminedType(string $type): void
     {
-        if (\in_array(\strtolower($type), self::NOT_SUPPORTED_TYPES)) {
+        if (in_array(strtolower($type), self::NOT_SUPPORTED_TYPES)) {
             throw SetException::determinedTypeIsNotValid($type);
         }
 
         try {
             self::createTypeFromName($type);
-        } catch (\Exception $exception) { // @codeCoverageIgnore
+        } catch (Exception $exception) { // @codeCoverageIgnore
             throw SetException::determinedTypeIsNotValid($type, $exception); // @codeCoverageIgnore
         }
     }
 
     /**
      * @param mixed $value
-     * @throws SetException
      * @return TypeInterface
+     * @throws RuntimeException
+     * @throws SetException
      */
     private static function createTypeFromValue($value): TypeInterface
     {
@@ -474,8 +502,9 @@ class Set implements \Countable, \IteratorAggregate
 
     /**
      * @param string $typeName
-     * @throws SetException
      * @return TypeInterface
+     * @throws RuntimeException
+     * @throws SetException
      */
     private static function createTypeFromName(string $typeName): TypeInterface
     {

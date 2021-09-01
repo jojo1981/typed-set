@@ -15,10 +15,10 @@ namespace Jojo1981\TypedSet;
 class Difference
 {
     /** @var array */
-    private $missingElements;
+    private array $missingElements;
 
     /** @var array */
-    private $extraElements;
+    private array $extraElements;
 
     /**
      * @param array $missingElements

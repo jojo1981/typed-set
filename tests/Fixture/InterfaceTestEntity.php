@@ -14,5 +14,4 @@ namespace Jojo1981\TypedSet\TestSuite\Fixture;
  */
 interface InterfaceTestEntity
 {
-
 }

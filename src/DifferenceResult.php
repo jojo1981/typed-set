@@ -15,16 +15,16 @@ namespace Jojo1981\TypedSet;
 class DifferenceResult
 {
     /** @var Difference */
-    private $lhs;
+    private Difference $lhs;
 
     /** @var Difference */
-    private $rhs;
+    private Difference $rhs;
 
     /** @var array */
-    private $same;
+    private array $same;
 
     /** @var bool */
-    private $equal;
+    private bool $equal;
 
     /**
      * @param Difference $lhs

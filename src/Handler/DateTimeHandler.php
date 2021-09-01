@@ -9,11 +9,14 @@
  */
 namespace Jojo1981\TypedSet\Handler;
 
+use DateTimeInterface;
 use Jojo1981\PhpTypes\AbstractType;
 use Jojo1981\PhpTypes\Exception\TypeException;
 use Jojo1981\PhpTypes\TypeInterface;
 use Jojo1981\TypedSet\Handler\Exception\HandlerException;
 use Jojo1981\TypedSet\HandlerInterface;
+use RuntimeException;
+use function hash;
 
 /**
  * @package Jojo1981\TypedSet\Handler
@@ -27,28 +30,29 @@ final class DateTimeHandler implements HandlerInterface
      */
     public function support($element, TypeInterface $type): bool
     {
-        return $element instanceof \DateTimeInterface;
+        return $element instanceof DateTimeInterface;
     }
 
     /**
-     * @param \DateTimeInterface $element
+     * @param DateTimeInterface $element
      * @param TypeInterface $type
-     * @throws HandlerException
      * @return string
+     * @throws RuntimeException
+     * @throws HandlerException
      */
     public function getHash($element, TypeInterface $type): string
     {
-        if (!$element instanceof \DateTimeInterface) {
+        if (!$element instanceof DateTimeInterface) {
             $expectedType = null;
             $actualType = null;
             try {
-                $expectedType = AbstractType::createFromTypeName(\DateTimeInterface::class);
+                $expectedType = AbstractType::createFromTypeName(DateTimeInterface::class);
                 $actualType = AbstractType::createFromValue($element);
             } catch (TypeException $exception) {} // @codeCoverageIgnore
 
             throw HandlerException::canNotHandleElement($expectedType, $actualType);
         }
 
-        return \hash('sha256', (string) $element->getTimestamp());
+        return hash('sha256', (string) $element->getTimestamp());
     }
 }

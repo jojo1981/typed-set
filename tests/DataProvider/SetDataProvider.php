@@ -9,6 +9,7 @@
  */
 namespace Jojo1981\TypedSet\TestSuite\DataProvider;
 
+use ArrayIterator;
 use Jojo1981\PhpTypes\ArrayType;
 use Jojo1981\PhpTypes\CallableType;
 use Jojo1981\PhpTypes\ClassType;
@@ -23,12 +24,15 @@ use Jojo1981\PhpTypes\Value\Exception\ValueException;
 use Jojo1981\TypedSet\Difference;
 use Jojo1981\TypedSet\DifferenceResult;
 use Jojo1981\TypedSet\Exception\SetException;
+use Jojo1981\TypedSet\Handler\Exception\HandlerException;
 use Jojo1981\TypedSet\Set;
 use Jojo1981\TypedSet\TestSuite\Fixture\AbstractTestEntity;
 use Jojo1981\TypedSet\TestSuite\Fixture\InterfaceTestEntity;
 use Jojo1981\TypedSet\TestSuite\Fixture\TestEntity;
 use Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase;
 use Jojo1981\TypedSet\TestSuite\Fixture\TestHashableEntity1;
+use RuntimeException;
+use stdClass;
 
 /**
  * @package Jojo1981\TypedSet\TestSuite\DataProvider
@@ -78,7 +82,7 @@ final class SetDataProvider
             ],
             [
                 'iterable',
-                [($iterable1 = new \ArrayIterator()), ($iterable2 = new \ArrayIterator()), $iterable1],
+                [($iterable1 = new ArrayIterator()), ($iterable2 = new ArrayIterator()), $iterable1],
                 [$iterable1, $iterable2]
             ],
             [
@@ -121,7 +125,7 @@ final class SetDataProvider
             ['int', [-1, 0, 1, 5, []], 'Data is not of type: `int`, but of type: `array`'],
             ['int', [-1, 0, 1, 5, ['item1', 'item2']], 'Data is not of type: `int`, but of type: `array`'],
             ['int', [-1, 0, 1, 5, ['key' => 'value']], 'Data is not of type: `int`, but of type: `array`'],
-            ['int', [-1, 0, 1, 5, new \stdClass()], 'Data is not of type: `int`, but an instance of: `\stdClass`'],
+            ['int', [-1, 0, 1, 5, new stdClass()], 'Data is not of type: `int`, but an instance of: `\stdClass`'],
             ['int', [-1, 0, 1, 5, new TestEntity()], 'Data is not of type: `int`, but an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntity`'],
             ['int', [-1, 0, 1, 5, new TestEntityBase()], 'Data is not of type: `int`, but an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase`'],
 
@@ -134,7 +138,7 @@ final class SetDataProvider
             ['integer', [-1, 0, 1, 5, []], 'Data is not of type: `int`, but of type: `array`'],
             ['integer', [-1, 0, 1, 5, ['item1', 'item2']], 'Data is not of type: `int`, but of type: `array`'],
             ['integer', [-1, 0, 1, 5, ['key' => 'value']], 'Data is not of type: `int`, but of type: `array`'],
-            ['integer', [-1, 0, 1, 5, new \stdClass()], 'Data is not of type: `int`, but an instance of: `\stdClass`'],
+            ['integer', [-1, 0, 1, 5, new stdClass()], 'Data is not of type: `int`, but an instance of: `\stdClass`'],
             ['integer', [-1, 0, 1, 5, new TestEntity()], 'Data is not of type: `int`, but an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntity`'],
             ['integer', [-1, 0, 1, 5, new TestEntityBase()], 'Data is not of type: `int`, but an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase`'],
 
@@ -147,7 +151,7 @@ final class SetDataProvider
             ['float', [-1.0, 0.0, 1.0, 3.25, []], 'Data is not of type: `float`, but of type: `array`'],
             ['float', [-1.0, 0.0, 1.0, 3.25, ['item1', 'item2']], 'Data is not of type: `float`, but of type: `array`'],
             ['float', [-1.0, 0.0, 1.0, 3.25, ['key' => 'value']], 'Data is not of type: `float`, but of type: `array`'],
-            ['float', [-1.0, 0.0, 1.0, 3.25, new \stdClass()], 'Data is not of type: `float`, but an instance of: `\stdClass`'],
+            ['float', [-1.0, 0.0, 1.0, 3.25, new stdClass()], 'Data is not of type: `float`, but an instance of: `\stdClass`'],
             ['float', [-1.0, 0.0, 1.0, 3.25, new TestEntity()], 'Data is not of type: `float`, but an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntity`'],
             ['float', [-1.0, 0.0, 1.0, 3.25, new TestEntityBase()], 'Data is not of type: `float`, but an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase`'],
 
@@ -160,7 +164,7 @@ final class SetDataProvider
             ['double', [-1.0, 0.0, 1.0, 3.25, []], 'Data is not of type: `float`, but of type: `array`'],
             ['double', [-1.0, 0.0, 1.0, 3.25, ['item1', 'item2']], 'Data is not of type: `float`, but of type: `array`'],
             ['double', [-1.0, 0.0, 1.0, 3.25, ['key' => 'value']], 'Data is not of type: `float`, but of type: `array`'],
-            ['double', [-1.0, 0.0, 1.0, 3.25, new \stdClass()], 'Data is not of type: `float`, but an instance of: `\stdClass`'],
+            ['double', [-1.0, 0.0, 1.0, 3.25, new stdClass()], 'Data is not of type: `float`, but an instance of: `\stdClass`'],
             ['double', [-1.0, 0.0, 1.0, 3.25, new TestEntity()], 'Data is not of type: `float`, but an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntity`'],
             ['double', [-1.0, 0.0, 1.0, 3.25, new TestEntityBase()], 'Data is not of type: `float`, but an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase`'],
 
@@ -173,7 +177,7 @@ final class SetDataProvider
             ['number', [-1.0, 0.0, 1.0, 3.25, []], 'Data is not of type: `float`, but of type: `array`'],
             ['number', [-1.0, 0.0, 1.0, 3.25, ['item1', 'item2']], 'Data is not of type: `float`, but of type: `array`'],
             ['number', [-1.0, 0.0, 1.0, 3.25, ['key' => 'value']], 'Data is not of type: `float`, but of type: `array`'],
-            ['number', [-1.0, 0.0, 1.0, 3.25, new \stdClass()], 'Data is not of type: `float`, but an instance of: `\stdClass`'],
+            ['number', [-1.0, 0.0, 1.0, 3.25, new stdClass()], 'Data is not of type: `float`, but an instance of: `\stdClass`'],
             ['number', [-1.0, 0.0, 1.0, 3.25, new TestEntity()], 'Data is not of type: `float`, but an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntity`'],
             ['number', [-1.0, 0.0, 1.0, 3.25, new TestEntityBase()], 'Data is not of type: `float`, but an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase`'],
 
@@ -188,7 +192,7 @@ final class SetDataProvider
             ['string', ['text', []], 'Data is not of type: `string`, but of type: `array`'],
             ['string', ['text', ['item1', 'item2']], 'Data is not of type: `string`, but of type: `array`'],
             ['string', ['text', ['key' => 'value']], 'Data is not of type: `string`, but of type: `array`'],
-            ['string', ['text', new \stdClass()], 'Data is not of type: `string`, but an instance of: `\stdClass`'],
+            ['string', ['text', new stdClass()], 'Data is not of type: `string`, but an instance of: `\stdClass`'],
             ['string', ['text', new TestEntity()], 'Data is not of type: `string`, but an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntity`'],
             ['string', ['text', new TestEntityBase()], 'Data is not of type: `string`, but an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase`'],
 
@@ -201,22 +205,22 @@ final class SetDataProvider
             ['array', [[], ['item1', 'item2'], ['key' => 'value'], 1.0], 'Data is not of type: `array`, but of type: `float`'],
             ['array', [[], ['item1', 'item2'], ['key' => 'value'], true], 'Data is not of type: `array`, but of type: `bool`'],
             ['array', [[], ['item1', 'item2'], ['key' => 'value'], false], 'Data is not of type: `array`, but of type: `bool`'],
-            ['array', [[], ['item1', 'item2'], ['key' => 'value'], new \stdClass()], 'Data is not of type: `array`, but an instance of: `\stdClass`'],
+            ['array', [[], ['item1', 'item2'], ['key' => 'value'], new stdClass()], 'Data is not of type: `array`, but an instance of: `\stdClass`'],
             ['array', [[], ['item1', 'item2'], ['key' => 'value'], new TestEntity()], 'Data is not of type: `array`, but an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntity`'],
             ['array', [[], ['item1', 'item2'], ['key' => 'value'], new TestEntityBase()], 'Data is not of type: `array`, but an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase`'],
 
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), 'text'], 'Data is not of type: `object`, but of type: `string`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), -1], 'Data is not of type: `object`, but of type: `int`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), 0], 'Data is not of type: `object`, but of type: `int`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), 1], 'Data is not of type: `object`, but of type: `int`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), -1.0], 'Data is not of type: `object`, but of type: `float`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), 0.0], 'Data is not of type: `object`, but of type: `float`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), 1.0], 'Data is not of type: `object`, but of type: `float`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), true], 'Data is not of type: `object`, but of type: `bool`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), false], 'Data is not of type: `object`, but of type: `bool`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), []], 'Data is not of type: `object`, but of type: `array`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), ['item1', 'item2']], 'Data is not of type: `object`, but of type: `array`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), ['key' => 'value']], 'Data is not of type: `object`, but of type: `array`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), 'text'], 'Data is not of type: `object`, but of type: `string`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), -1], 'Data is not of type: `object`, but of type: `int`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), 0], 'Data is not of type: `object`, but of type: `int`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), 1], 'Data is not of type: `object`, but of type: `int`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), -1.0], 'Data is not of type: `object`, but of type: `float`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), 0.0], 'Data is not of type: `object`, but of type: `float`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), 1.0], 'Data is not of type: `object`, but of type: `float`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), true], 'Data is not of type: `object`, but of type: `bool`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), false], 'Data is not of type: `object`, but of type: `bool`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), []], 'Data is not of type: `object`, but of type: `array`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), ['item1', 'item2']], 'Data is not of type: `object`, but of type: `array`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), ['key' => 'value']], 'Data is not of type: `object`, but of type: `array`'],
         ];
     }
 
@@ -238,8 +242,8 @@ final class SetDataProvider
             [TestEntity::class, [new TestEntity(), []], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntity`, but of type: `array`'],
             [TestEntity::class, [new TestEntity(), ['item1', 'item2']], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntity`, but of type: `array`'],
             [TestEntity::class, [new TestEntity(), ['key' => 'value']], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntity`, but of type: `array`'],
-            [TestEntity::class, [new TestEntity(), new \stdClass()], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntity`, but an instance of: `\stdClass`'],
-            [TestEntity::class, [new TestEntityBase(), new \stdClass()], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntity`, but an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase`'],
+            [TestEntity::class, [new TestEntity(), new stdClass()], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntity`, but an instance of: `\stdClass`'],
+            [TestEntity::class, [new TestEntityBase(), new stdClass()], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntity`, but an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase`'],
 
             [TestEntityBase::class, [new TestEntity(), -1], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase`, but of type: `int`'],
             [TestEntityBase::class, [new TestEntity(), 0], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase`, but of type: `int`'],
@@ -253,7 +257,7 @@ final class SetDataProvider
             [TestEntityBase::class, [new TestEntity(), []], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase`, but of type: `array`'],
             [TestEntityBase::class, [new TestEntity(), ['item1', 'item2']], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase`, but of type: `array`'],
             [TestEntityBase::class, [new TestEntity(), ['key' => 'value']], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase`, but of type: `array`'],
-            [TestEntityBase::class, [new TestEntity(), new \stdClass()], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase`, but an instance of: `\stdClass`'],
+            [TestEntityBase::class, [new TestEntity(), new stdClass()], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase`, but an instance of: `\stdClass`'],
 
             [AbstractTestEntity::class, [new TestEntityBase(), new TestEntity(), -1], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\AbstractTestEntity`, but of type: `int`'],
             [AbstractTestEntity::class, [new TestEntityBase(), new TestEntity(), 0], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\AbstractTestEntity`, but of type: `int`'],
@@ -267,7 +271,7 @@ final class SetDataProvider
             [AbstractTestEntity::class, [new TestEntityBase(), new TestEntity(), []], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\AbstractTestEntity`, but of type: `array`'],
             [AbstractTestEntity::class, [new TestEntityBase(), new TestEntity(), ['item1', 'item2']], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\AbstractTestEntity`, but of type: `array`'],
             [AbstractTestEntity::class, [new TestEntityBase(), new TestEntity(), ['key' => 'value']], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\AbstractTestEntity`, but of type: `array`'],
-            [AbstractTestEntity::class, [new TestEntityBase(), new TestEntity(), new \stdClass()], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\AbstractTestEntity`, but an instance of: `\stdClass`'],
+            [AbstractTestEntity::class, [new TestEntityBase(), new TestEntity(), new stdClass()], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\AbstractTestEntity`, but an instance of: `\stdClass`'],
 
             [InterfaceTestEntity::class, [new TestEntityBase(), new TestEntity(), -1], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\InterfaceTestEntity`, but of type: `int`'],
             [InterfaceTestEntity::class, [new TestEntityBase(), new TestEntity(), 0], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\InterfaceTestEntity`, but of type: `int`'],
@@ -281,7 +285,7 @@ final class SetDataProvider
             [InterfaceTestEntity::class, [new TestEntityBase(), new TestEntity(), []], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\InterfaceTestEntity`, but of type: `array`'],
             [InterfaceTestEntity::class, [new TestEntityBase(), new TestEntity(), ['item1', 'item2']], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\InterfaceTestEntity`, but of type: `array`'],
             [InterfaceTestEntity::class, [new TestEntityBase(), new TestEntity(), ['key' => 'value']], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\InterfaceTestEntity`, but of type: `array`'],
-            [InterfaceTestEntity::class, [new TestEntityBase(), new TestEntity(), new \stdClass()], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\InterfaceTestEntity`, but an instance of: `\stdClass`']
+            [InterfaceTestEntity::class, [new TestEntityBase(), new TestEntity(), new stdClass()], 'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\InterfaceTestEntity`, but an instance of: `\stdClass`']
         ];
     }
 
@@ -304,7 +308,7 @@ final class SetDataProvider
             ['callable', 'callable'],
             ['callback', 'callable'],
             ['iterable', 'iterable'],
-            [\stdClass::class, '\\' . \stdClass::class],
+            [stdClass::class, '\\' . stdClass::class],
             [InterfaceTestEntity::class, '\\' . InterfaceTestEntity::class],
             [AbstractTestEntity::class, '\\' . AbstractTestEntity::class],
             [TestEntityBase::class, '\\' . TestEntityBase::class],
@@ -434,8 +438,10 @@ final class SetDataProvider
     }
 
     /**
-     * @throws SetException
      * @return array[]
+     * @throws HandlerException
+     * @throws RuntimeException
+     * @throws SetException
      */
     public function getIsEqualTestData(): array
     {
@@ -499,16 +505,22 @@ final class SetDataProvider
     public function getExceptionTestData(): array
     {
         return [
-            ['string', 4, new SetException('Data is not of type: `string`, but of type: `int`')],
-            ['integer', new \stdClass(), new SetException('Data is not of type: `int`, but an instance of: `\stdClass`')],
-            [\stdClass::class, 'text', new SetException('Data is not an instance of: `\stdClass`, but of type: `string`')],
-            [\stdClass::class, new TestEntity(), new SetException('Data is not an instance of: `\stdClass`, but an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntity`')],
+            ['string', 4,'Data is not of type: `string`, but of type: `int`'],
+            ['integer', new stdClass(), 'Data is not of type: `int`, but an instance of: `\stdClass`'],
+            [stdClass::class, 'text', 'Data is not an instance of: `\stdClass`, but of type: `string`'],
+            [
+                stdClass::class,
+                new TestEntity(),
+                'Data is not an instance of: `\stdClass`, but an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntity`'
+            ],
         ];
     }
 
     /**
-     * @throws SetException
      * @return array[]
+     * @throws HandlerException
+     * @throws RuntimeException
+     * @throws SetException
      */
     public function getCompareTestData(): array
     {
@@ -518,7 +530,11 @@ final class SetDataProvider
             [new Set('object'), new Set('object'), $this->createEmptyIsEqualDifferenceResult()],
             [new Set('int'), new Set('int'), $this->createEmptyIsEqualDifferenceResult()],
             [new Set('int'), new Set('int'), $this->createEmptyIsEqualDifferenceResult()],
-            [new Set('int', [1, 2]), new Set('int', [3, 4]), new DifferenceResult(new Difference([3, 4], [1, 2]), new Difference([1, 2], [3, 4]), [], false)],
+            [
+                new Set('int', [1, 2]),
+                new Set('int', [3, 4]),
+                new DifferenceResult(new Difference([3, 4], [1, 2]), new Difference([1, 2], [3, 4]), [], false)
+            ],
             [new Set('int', [1, 2]), new Set('int', []), new DifferenceResult(new Difference([], [1, 2]), new Difference([1, 2], []), [], false)],
             [new Set('int', []), new Set('int', [1, 2]), new DifferenceResult(new Difference([1, 2], []), new Difference([], [1, 2]), [], false)],
             [new Set('int', [1, 2]), new Set('int', [2, 3]), new DifferenceResult(new Difference([3], [1]), new Difference([1], [3]), [2], false)]

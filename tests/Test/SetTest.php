@@ -9,6 +9,9 @@
  */
 namespace Jojo1981\TypedSet\TestSuite\Test;
 
+use DateTime;
+use DateTimeInterface;
+use Exception;
 use Jojo1981\PhpTypes\TypeInterface;
 use Jojo1981\TypedSet\DifferenceResult;
 use Jojo1981\TypedSet\Exception\SetException;
@@ -19,36 +22,44 @@ use Jojo1981\TypedSet\TestSuite\Fixture\StringHandler;
 use Jojo1981\TypedSet\TestSuite\Fixture\TestEntityBase;
 use Jojo1981\TypedSet\TestSuite\Fixture\TestHashableEntity1;
 use Jojo1981\TypedSet\TestSuite\Fixture\TestHashableEntity2;
+use PHPUnit\Framework\Exception as PHPUnitFrameworkException;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use stdClass;
+use Traversable;
+use function substr;
 
 /**
  * @package Jojo1981\TypedSet\TestSuite\Test
  */
-class SetTest extends TestCase
+final class SetTest extends TestCase
 {
     /**
      * @runInSeparateProcess
      *
+     * @return void
+     * @throws Exception
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testWithDateTimeObjects(): void
     {
-        $date1 = new \DateTime('tomorrow');
+        $date1 = new DateTime('tomorrow');
         $date2 = clone $date1;
-        $date3 = new \DateTime('now');
+        $date3 = new DateTime('now');
 
-        $set1 = (new Set(\DateTimeInterface::class, [$date1, $date2, $date3, $date1]));
+        $set1 = (new Set(DateTimeInterface::class, [$date1, $date2, $date3, $date1]));
         self::assertEquals(3, $set1->count());
         self::assertEquals([$date1, $date2, $date3], $set1->toArray());
 
         GlobalHandler::getInstance()->addDefaultHandlers();
 
-        $set2 = (new Set(\DateTimeInterface::class, [$date1, $date2, $date3, $date1]));
+        $set2 = (new Set(DateTimeInterface::class, [$date1, $date2, $date3, $date1]));
         self::assertEquals(2, $set2->count());
         self::assertEquals([$date1, $date3], $set2->toArray());
     }
@@ -56,10 +67,12 @@ class SetTest extends TestCase
     /**
      * @runInSeparateProcess
      *
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testWithCustomHandler(): void
     {
@@ -78,10 +91,12 @@ class SetTest extends TestCase
      * @param string $type
      * @param array $elements
      * @param array $expectedArray
-     * @throws SetException
-     * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
      * @return void
+     * @throws HandlerException
+     * @throws InvalidArgumentException
+     * @throws SetException
+     * @throws RuntimeException
+     * @throws ExpectationFailedException
      */
     public function testIgnoringDuplicates(string $type, array $elements, array $expectedArray): void
     {
@@ -92,14 +107,14 @@ class SetTest extends TestCase
      * @dataProvider \Jojo1981\TypedSet\TestSuite\DataProvider\SetDataProvider::getInvalidTypes()
      *
      * @param string $invalidType
-     * @throws SetException
      * @return void
+     * @throws SetException
+     * @throws RuntimeException
+     * @throws HandlerException
      */
     public function testConstructWithInvalidTypeShouldThrowCollectionException(string $invalidType): void
     {
-        $this->expectExceptionObject(new SetException(
-            'Given type: `' . $invalidType . '` is not a valid type and also not an existing class'
-        ));
+        $this->expectExceptionObject(SetException::givenTypeIsNotValid($invalidType));
         new Set($invalidType);
     }
 
@@ -107,18 +122,21 @@ class SetTest extends TestCase
      * @dataProvider \Jojo1981\TypedSet\TestSuite\DataProvider\SetDataProvider::getPrimitiveTypeWithInvalidData
      *
      * @param string $type
-     * @param mixed[] $invalidData
+     * @param array $invalidData
      * @param string $message
-     * @throws SetException
      * @return void
+     * @throws SetException
+     * @throws RuntimeException
+     * @throws HandlerException
      */
     public function testConstructWithValidPrimitiveTypeButInvalidElementShouldThrowCollectionException(
         string $type,
         array $invalidData,
         string $message
-    ): void
-    {
-        $this->expectExceptionObject(new SetException($message));
+    ): void {
+        $this->expectException(SetException::class);
+        $this->expectExceptionMessage($message);
+        $this->expectExceptionCode(0);
         new Set($type, $invalidData);
     }
 
@@ -126,18 +144,21 @@ class SetTest extends TestCase
      * @dataProvider \Jojo1981\TypedSet\TestSuite\DataProvider\SetDataProvider::getClassNameTypeWithInvalidData
      *
      * @param string $type
-     * @param mixed[] $invalidData
+     * @param array $invalidData
      * @param string $message
-     * @throws SetException
      * @return void
+     * @throws SetException
+     * @throws RuntimeException
+     * @throws HandlerException
      */
     public function testConstructWithValidClassNameTypeButInvalidElementShouldThrowCollectionException(
         string $type,
         array $invalidData,
         string $message
-    ): void
-    {
-        $this->expectExceptionObject(new SetException($message));
+    ): void {
+        $this->expectException(SetException::class);
+        $this->expectExceptionMessage($message);
+        $this->expectExceptionCode(0);
         new Set($type, $invalidData);
     }
 
@@ -146,23 +167,28 @@ class SetTest extends TestCase
      *
      * @param string $type
      * @param mixed $element
-     * @param \Exception $expectedException
+     * @param string $message
+     * @return void
+     * @throws RuntimeException
      * @throws SetException
      * @throws HandlerException
-     * @return void
      */
-    public function testAddWithInvalidElement(string $type, $element, \Exception $expectedException): void
+    public function testAddWithInvalidElement(string $type, $element, string $message): void
     {
-        $this->expectExceptionObject($expectedException);
+        $this->expectException(SetException::class);
+        $this->expectExceptionMessage($message);
+        $this->expectExceptionCode(0);
         (new Set($type))->add($element);
     }
 
     /**
+     * @return void
      * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws PHPUnitFrameworkException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testAddWithNewElement(): void
     {
@@ -173,11 +199,13 @@ class SetTest extends TestCase
     }
 
     /**
+     * @return void
      * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws PHPUnitFrameworkException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testAddWithExistingElement(): void
     {
@@ -192,23 +220,28 @@ class SetTest extends TestCase
      *
      * @param string $type
      * @param mixed $element
-     * @param \Exception $expectedException
-     * @throws HandlerException
-     * @throws SetException
+     * @param string $message
      * @return void
+     * @throws RuntimeException
+     * @throws SetException
+     * @throws HandlerException
      */
-    public function testAddAllWithInvalidElement(string $type, $element, \Exception $expectedException): void
+    public function testAddAllWithInvalidElement(string $type, $element, string $message): void
     {
-        $this->expectExceptionObject($expectedException);
+        $this->expectException(SetException::class);
+        $this->expectExceptionMessage($message);
+        $this->expectExceptionCode(0);
         (new Set($type))->addAll([$element]);
     }
 
     /**
+     * @return void
      * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws PHPUnitFrameworkException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testAddAllWithOnlyNewElements(): void
     {
@@ -219,11 +252,13 @@ class SetTest extends TestCase
     }
 
     /**
+     * @return void
      * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws PHPUnitFrameworkException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testAddAllWithSomeExistingElements(): void
     {
@@ -238,56 +273,65 @@ class SetTest extends TestCase
      *
      * @param string $type
      * @param mixed $element
-     * @param \Exception $expectedException
-     * @throws SetException
-     * @throws HandlerException
+     * @param string $message
      * @return void
+     * @throws SetException
+     * @throws RuntimeException
+     * @throws HandlerException
      */
-    public function testContainsWithInvalidElement(string $type, $element, \Exception $expectedException): void
+    public function testContainsWithInvalidElement(string $type, $element, string $message): void
     {
-        $this->expectExceptionObject($expectedException);
+        $this->expectException(SetException::class);
+        $this->expectExceptionMessage($message);
+        $this->expectExceptionCode(0);
         (new Set($type))->contains($element);
     }
 
     /**
+     * @return void
      * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testContainsWithNotExistingElement(): void
     {
-        $existingValue = new \stdClass();
+        $existingValue = new stdClass();
         $notExistingValue = new TestEntityBase();
         $set = (new Set('object', [$existingValue]));
         self::assertFalse($set->contains($notExistingValue));
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
-     * @throws HandlerException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testContainsWithExistingElement(): void
     {
-        $existingValue = new \stdClass();
+        $existingValue = new stdClass();
         $set = (new Set('object', [$existingValue]));
         self::assertTrue($set->contains($existingValue));
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testRemove(): void
     {
-        $callable1 = static function () {};
-        $callable2 = static function () {};
+        $callable1 = static function () {
+        };
+        $callable2 = static function () {
+        };
 
         $set = (new Set('callable', [$callable1, $callable2, $callable1]));
         self::assertEquals(2, $set->count());
@@ -298,10 +342,12 @@ class SetTest extends TestCase
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testClear(): void
     {
@@ -312,10 +358,12 @@ class SetTest extends TestCase
     }
 
     /**
-     * @throws SetException
-     * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
      * @return void
+     * @throws HandlerException
+     * @throws InvalidArgumentException
+     * @throws SetException
+     * @throws RuntimeException
+     * @throws ExpectationFailedException
      */
     public function testIsEmpty(): void
     {
@@ -324,10 +372,12 @@ class SetTest extends TestCase
     }
 
     /**
-     * @throws SetException
-     * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
      * @return void
+     * @throws HandlerException
+     * @throws InvalidArgumentException
+     * @throws SetException
+     * @throws RuntimeException
+     * @throws ExpectationFailedException
      */
     public function testIsNonEmpty(): void
     {
@@ -336,10 +386,12 @@ class SetTest extends TestCase
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testToArray(): void
     {
@@ -353,10 +405,12 @@ class SetTest extends TestCase
      *
      * @param string $type
      * @param string $expectedType
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testGetType(string $type, string $expectedType): void
     {
@@ -369,10 +423,12 @@ class SetTest extends TestCase
      * @param string $type
      * @param TypeInterface $otherType
      * @param bool $expectedResult
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testIsEqualType(string $type, TypeInterface $otherType, bool $expectedResult): void
     {
@@ -385,11 +441,11 @@ class SetTest extends TestCase
      * @param Set $setA
      * @param Set $setB
      * @param bool $expectedResult
-     * @throws HandlerException
+     * @return void
      * @throws InvalidArgumentException
      * @throws SetException
      * @throws ExpectationFailedException
-     * @return void
+     * @throws HandlerException
      */
     public function testIsEqual(Set $setA, Set $setB, bool $expectedResult): void
     {
@@ -397,12 +453,16 @@ class SetTest extends TestCase
     }
 
     /**
-     * @throws SetException
      * @return void
+     * @throws SetException
+     * @throws RuntimeException
+     * @throws HandlerException
      */
     public function testCompareWithInCompatible(): void
     {
-        $this->expectExceptionObject(new SetException('Can not compare 2 sets of different types'));
+        $this->expectException(SetException::class);
+        $this->expectExceptionMessage('Can not compare 2 sets of different types');
+        $this->expectExceptionCode(0);
         (new Set('string'))->compare(new Set('int'));
     }
 
@@ -412,10 +472,10 @@ class SetTest extends TestCase
      * @param Set $setA
      * @param Set $setB
      * @param DifferenceResult $expectedResult
-     * @throws InvalidArgumentException
+     * @return void
      * @throws SetException
      * @throws ExpectationFailedException
-     * @return void
+     * @throws InvalidArgumentException
      */
     public function testCompare(Set $setA, Set $setB, DifferenceResult $expectedResult): void
     {
@@ -423,61 +483,80 @@ class SetTest extends TestCase
     }
 
     /**
-     * @throws SetException
      * @return void
+     * @throws SetException
+     * @throws RuntimeException
+     * @throws HandlerException
      */
     public function testMapWithInvalidTypeShouldThrowSetException(): void
     {
-        $this->expectExceptionObject(new SetException(
-            'Given type: `invalidType` is not a valid type and also not an existing class'
-        ));
-        (new Set('string', []))->map(static function () {}, 'invalidType');
+        $this->expectException(SetException::class);
+        $this->expectExceptionMessage('Given type: `invalidType` is not a valid type and also not an existing class');
+        $this->expectExceptionCode(0);
+        (new Set('string', []))->map(static function () {
+        }, 'invalidType');
     }
 
     /**
-     * @throws SetException
      * @return void
+     * @throws SetException
+     * @throws RuntimeException
+     * @throws HandlerException
      */
     public function testMapWithoutTypeOnEmptySetShouldThrowSetException(): void
     {
-        $this->expectExceptionObject(new SetException('Type can not be omitted on an empty Set'));
+        $this->expectException(SetException::class);
+        $this->expectExceptionMessage('Type can not be omitted on an empty Set');
+        $this->expectExceptionCode(0);
         (new Set('string', []))->map(static function () {});
     }
 
     /**
-     * @throws SetException
      * @return void
+     * @throws SetException
+     * @throws RuntimeException
+     * @throws HandlerException
      */
     public function testMapWithoutTypeWithMapperReturningUnsupportedDataSetShouldThrowSetException(): void
     {
-        $this->expectExceptionObject(new SetException(
-            'Determined type: `null` is not a valid type and also not an existing class'
-        ));
-        (new Set('string', ['text1']))->map(static function () { return null; });
+        $this->expectException(SetException::class);
+        $this->expectExceptionMessage('Determined type: `null` is not a valid type and also not an existing class');
+        $this->expectExceptionCode(0);
+        (new Set('string', ['text1']))->map(static function () {
+            return null;
+        });
     }
 
     /**
-     * @throws SetException
      * @return void
+     * @throws SetException
+     * @throws RuntimeException
+     * @throws HandlerException
      */
     public function testMapWithValidTypeWithMapperReturningViolatingDataDataSetShouldThrowSetException(): void
     {
-        $this->expectExceptionObject(new SetException('Mapper is not returning a correct value. Data is not of type: `int`, but an instance of: `\stdClass`'));
+        $this->expectException(SetException::class);
+        $this->expectExceptionMessage('Mapper is not returning a correct value. Data is not of type: `int`, but an instance of: `\stdClass`');
+        $this->expectExceptionCode(0);
         $mapper = static function () {
-            return new \stdClass();
+            return new stdClass();
         };
         (new Set('string', ['text1']))->map($mapper, 'int');
     }
 
     /**
-     * @throws SetException
      * @return void
+     * @throws SetException
+     * @throws RuntimeException
+     * @throws HandlerException
      */
     public function testMapWithoutTypeWithMapperReturningViolatingDataDataSetShouldThrowSetException(): void
     {
-        $this->expectExceptionObject(new SetException('Mapper is not returning a correct value. Data is not of type: `int`, but of type: `string`'));
+        $this->expectException(SetException::class);
+        $this->expectExceptionMessage('Mapper is not returning a correct value. Data is not of type: `int`, but of type: `string`');
+        $this->expectExceptionCode(0);
         $isCalled = false;
-        $mapper = static function () use (&$isCalled)  {
+        $mapper = static function () use (&$isCalled) {
             if (!$isCalled) {
                 $isCalled = true;
 
@@ -490,24 +569,30 @@ class SetTest extends TestCase
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testMapWithValidTypeAndEmptySetShouldReturnNewMappedSet(): void
     {
         $set1 = new Set('text');
         self::assertEquals('string', $set1->getType());
-        $set2 = $set1->map(static function () {}, 'integer');
+        $set2 = $set1->map(static function () {
+        }, 'integer');
         self::assertEquals('int', $set2->getType());
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws PHPUnitFrameworkException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testMapWithValidTypeAndNonEmptySetShouldReturnNewMappedSet(): void
     {
@@ -517,7 +602,7 @@ class SetTest extends TestCase
         self::assertEquals(['text2', 'text1', 'text3'], $originalSet->toArray());
 
         $mapper = static function (string $text): int {
-            return (int) \substr($text, -1);
+            return (int) substr($text, -1);
         };
 
         $newMappedSet = $originalSet->map($mapper, 'integer');
@@ -527,10 +612,13 @@ class SetTest extends TestCase
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws PHPUnitFrameworkException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testMapWithoutTypeAndNonEmptySetShouldReturnNewMappedSet(): void
     {
@@ -540,7 +628,7 @@ class SetTest extends TestCase
         self::assertEquals(['text2', 'text1', 'text3'], $originalSet->toArray());
 
         $mapper = static function (string $text): int {
-            return (int) \substr($text, -1);
+            return (int) substr($text, -1);
         };
 
         $newMappedSet = $originalSet->map($mapper);
@@ -551,8 +639,10 @@ class SetTest extends TestCase
 
     /**
      * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
      */
     public function testMapWithoutGivenTypeShouldCallMapperWithRightArguments(): void
@@ -578,8 +668,10 @@ class SetTest extends TestCase
 
     /**
      * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
      */
     public function testMapWithGivenTypeShouldCallMapperWithRightArguments(): void
@@ -599,24 +691,30 @@ class SetTest extends TestCase
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws PHPUnitFrameworkException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testFilterEmptySet(): void
     {
         $originalSet = new Set('string');
         self::assertCount(0, $originalSet);
-        $filteredSet = $originalSet->filter(static function () {});
+        $filteredSet = $originalSet->filter(static function () {
+        });
         self::assertCount(0, $filteredSet);
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testFilter(): void
     {
@@ -629,22 +727,27 @@ class SetTest extends TestCase
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testFindEmptySet(): void
     {
         $set = new Set('string');
-        self::assertNull($set->find(static function () {}));
+        self::assertNull($set->find(static function () {
+        }));
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testFind(): void
     {
@@ -665,21 +768,26 @@ class SetTest extends TestCase
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testAllEmptySet(): void
     {
-        self::assertTrue((new Set('int'))->all(static function () {}));
+        self::assertTrue((new Set('int'))->all(static function () {
+        }));
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testAll(): void
     {
@@ -696,21 +804,26 @@ class SetTest extends TestCase
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testSomeEmptySet(): void
     {
-        self::assertFalse((new Set('int'))->some(static function () {}));
+        self::assertFalse((new Set('int'))->some(static function () {
+        }));
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testSome(): void
     {
@@ -724,21 +837,26 @@ class SetTest extends TestCase
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testNoneEmptySet(): void
     {
-        self::assertTrue((new Set('int'))->none(static function () {}));
+        self::assertTrue((new Set('int'))->none(static function () {
+        }));
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testNone(): void
     {
@@ -752,10 +870,13 @@ class SetTest extends TestCase
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws PHPUnitFrameworkException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testCount(): void
     {
@@ -767,14 +888,17 @@ class SetTest extends TestCase
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws PHPUnitFrameworkException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testGetIterator(): void
     {
-        self::assertInstanceOf(\Traversable::class, (new Set('int', [1, 2, 3]))->getIterator());
+        self::assertInstanceOf(Traversable::class, (new Set('int', [1, 2, 3]))->getIterator());
         $expectedValues = [1, 2, 3];
         foreach (new Set('int', [1, 2, 3]) as $index => $item) {
             self::assertEquals($expectedValues[$index], $item);
@@ -782,8 +906,9 @@ class SetTest extends TestCase
     }
 
     /**
-     * @throws SetException
      * @return void
+     * @throws RuntimeException
+     * @throws SetException
      */
     public function testCreateFromElementsWithEmptyElements(): void
     {
@@ -792,24 +917,29 @@ class SetTest extends TestCase
     }
 
     /**
+     * @return void
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws PHPUnitFrameworkException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testCreateFromElements(): void
     {
         $set = Set::createFromElements([1, 2, 3]);
         self::assertEquals('int', $set->getType());
         self::assertCount(3, $set);
-        self::assertEquals([1,2,3], $set->toArray());
+        self::assertEquals([1, 2, 3], $set->toArray());
     }
 
     /**
+     * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
      * @throws SetException
+     * @throws PHPUnitFrameworkException
+     * @throws RuntimeException
      * @throws ExpectationFailedException
-     * @return void
      */
     public function testWithDifferenceClassesWithAreHashable(): void
     {

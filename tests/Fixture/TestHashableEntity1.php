@@ -10,14 +10,15 @@
 namespace Jojo1981\TypedSet\TestSuite\Fixture;
 
 use Jojo1981\Contracts\HashableInterface;
+use function hash;
 
 /**
  * @package Jojo1981\TypedSet\TestSuite\Fixture
  */
-class TestHashableEntity1 implements HashableInterface
+final class TestHashableEntity1 implements HashableInterface
 {
     /** @var string */
-    private $name;
+    private string $name;
 
     /**
      * @param string $name
@@ -32,6 +33,6 @@ class TestHashableEntity1 implements HashableInterface
      */
     public function getHash(): string
     {
-        return \hash('sha256', $this->name);
+        return hash('sha256', $this->name);
     }
 }

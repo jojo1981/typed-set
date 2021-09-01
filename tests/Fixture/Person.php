@@ -12,14 +12,18 @@ namespace Jojo1981\TypedSet\TestSuite\Fixture;
 /**
  * @package Jojo1981\TypedSet\TestSuite\Fixture
  */
-class Person
+final class Person
 {
     /** @var string */
-    private $name;
+    private string $name;
 
     /** @var int */
-    private $age;
+    private int $age;
 
+    /**
+     * @param string $name
+     * @param int $age
+     */
     public function __construct(string $name, int $age)
     {
         $this->name = $name;
