@@ -72,9 +72,10 @@ class Set implements Countable, IteratorAggregate
 
     /**
      * @param T $element
+     * @return void
+     * @throws RuntimeException
      * @throws SetException
      * @throws HandlerException
-     * @return void
      */
     public function add($element): void
     {
@@ -86,9 +87,10 @@ class Set implements Countable, IteratorAggregate
 
     /**
      * @param T[] $elements
+     * @return void
+     * @throws RuntimeException
      * @throws SetException
      * @throws HandlerException
-     * @return void
      */
     public function addAll(array $elements = []): void
     {
@@ -99,8 +101,9 @@ class Set implements Countable, IteratorAggregate
 
     /**
      * @param T $element
-     * @throws SetException
      * @throws HandlerException
+     * @throws RuntimeException
+     * @throws SetException
      * @return bool
      */
     public function contains($element): bool
@@ -112,6 +115,8 @@ class Set implements Countable, IteratorAggregate
 
     /**
      * @param T $element
+     * @throws HandlerException
+     * @throws RuntimeException
      * @throws SetException
      * @return void
      */
@@ -174,8 +179,9 @@ class Set implements Countable, IteratorAggregate
 
     /**
      * @param Set $other
-     * @throws SetException
      * @throws HandlerException
+     * @throws RuntimeException
+     * @throws SetException
      * @return bool
      */
     public function isEqual(Set $other): bool
@@ -194,6 +200,8 @@ class Set implements Countable, IteratorAggregate
 
     /**
      * @param Set $other
+     * @throws HandlerException
+     * @throws RuntimeException
      * @throws SetException
      * @return DifferenceResult
      */
@@ -304,6 +312,8 @@ class Set implements Countable, IteratorAggregate
 
     /**
      * @param callable $predicate
+     * @throws HandlerException
+     * @throws RuntimeException
      * @throws SetException
      * @return Set
      */
@@ -389,6 +399,31 @@ class Set implements Countable, IteratorAggregate
     }
 
     /**
+     * Merge other set(s) into this set. All sets should be exactly of the same type.
+     *
+     * @param Set $otherSet
+     * @param Set ...$otherSets
+     * @return $this
+     * @throws RuntimeException
+     * @throws SetException
+     * @throws HandlerException
+     */
+    public function merge(Set $otherSet, Set ...$otherSets): self
+    {
+        array_unshift($otherSets, $otherSet);
+
+        foreach ($otherSets as $currentOtherCollection) {
+            if (!$this->type->isAssignableType($currentOtherCollection->type)) {
+                throw SetException::couldNotMergeSets($this->type->getName(), $otherSet->getType());
+            }
+
+            $this->addAll($currentOtherCollection->toArray());
+        }
+
+        return $this;
+    }
+
+    /**
      * @param mixed $element
      * @return void
      * @throws RuntimeException
@@ -447,6 +482,53 @@ class Set implements Countable, IteratorAggregate
         }
 
         return new self((self::createTypeFromValue(reset($elements)))->getName(), $elements);
+    }
+
+    /**
+     * Create one collection from multiple collections.
+     *
+     * @param string $type
+     * @param Set[] $sets
+     * @return Set
+     * @throws RuntimeException
+     * @throws SetException
+     */
+    public static function createFromSets(string $type, array $sets): Set
+    {
+        self::assertGivenType($type);
+        $typeValue = self::createTypeFromName($type);
+        self::assertCollections($sets, $typeValue);
+
+        $result = new Set($typeValue->getName());
+        foreach ($sets as $set) {
+            $result->merge($set);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param Set[] $sets
+     * @param TypeInterface $typeValue
+     * @return void
+     * @throws SetException
+     */
+    private static function assertCollections(array $sets, TypeInterface $typeValue): void
+    {
+        if (empty($sets)) {
+            throw SetException::emptySets();
+        }
+        if (count($sets) < 2) {
+            throw SetException::notEnoughSets();
+        }
+        foreach ($sets as $collection) {
+            if (!$collection instanceof self) {
+                throw SetException::invalidSetsData();
+            }
+            if (!$typeValue->isAssignableType($collection->type)) {
+                throw SetException::setsNotAllOfSameType($typeValue, $collection->type);
+            }
+        }
     }
 
     /**

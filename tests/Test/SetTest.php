@@ -12,6 +12,8 @@ namespace Jojo1981\TypedSet\TestSuite\Test;
 use DateTime;
 use DateTimeInterface;
 use Exception;
+use Jojo1981\PhpTypes\IntegerType;
+use Jojo1981\PhpTypes\StringType;
 use Jojo1981\PhpTypes\TypeInterface;
 use Jojo1981\TypedSet\DifferenceResult;
 use Jojo1981\TypedSet\Exception\SetException;
@@ -969,6 +971,33 @@ final class SetTest extends TestCase
      * @return void
      * @throws RuntimeException
      * @throws SetException
+     * @throws HandlerException
+     */
+    public function testMergeSetOfDifferentTypeShouldThrowSetException(): void
+    {
+        $this->expectExceptionObject(SetException::couldNotMergeSets('string', 'int'));
+        (new Set('string', ['text1', 'text2', 'text3']))->merge(new Set('int', [1, 2, 3]));
+    }
+
+    /**
+     * @return void
+     * @throws HandlerException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     * @throws SetException
+     * @throws ExpectationFailedException
+     */
+    public function testMergeSetsOfSameTypeShouldUpdateTheCurrentSet(): void
+    {
+        $set = new Set('string', ['text1', 'text2', 'text3']);
+        $set->merge(new Set('string', ['text4', 'text5']));
+        self::assertEquals(['text1', 'text2', 'text3', 'text4', 'text5'], $set->toArray());
+    }
+
+    /**
+     * @return void
+     * @throws RuntimeException
+     * @throws SetException
      */
     public function testCreateFromElementsWithEmptyElements(): void
     {
@@ -990,6 +1019,83 @@ final class SetTest extends TestCase
         self::assertEquals('int', $set->getType());
         self::assertCount(3, $set);
         self::assertEquals([1, 2, 3], $set->toArray());
+    }
+
+    /**
+     * @return void
+     * @throws RuntimeException
+     * @throws SetException
+     * @throws HandlerException
+     */
+    public function testCreateFromSetsWithInvalidTypeShouldThrowSetException(): void
+    {
+        $this->expectExceptionObject(SetException::givenTypeIsNotValid('my-invalid-type'));
+        Set::createFromSets('my-invalid-type', [new Set('string', ['text1']), new Set('string', ['text2'])]);
+    }
+
+    /**
+     * @return void
+     * @throws SetException
+     * @throws RuntimeException
+     */
+    public function testCreateFromSetsWithEmptySetsShouldThrowSetException2(): void
+    {
+        $this->expectExceptionObject(SetException::emptySets());
+        Set::createFromSets('string', []);
+    }
+
+    /**
+     * @return void
+     * @throws RuntimeException
+     * @throws SetException
+     * @throws HandlerException
+     */
+    public function testCreateFromSetsWithNotEnoughSetsShouldThrowSetException2(): void
+    {
+        $this->expectExceptionObject(SetException::notEnoughSets());
+        Set::createFromSets('string', [new Set('string', ['text1'])]);
+    }
+
+    /**
+     * @return void
+     * @throws RuntimeException
+     * @throws SetException
+     * @throws HandlerException
+     */
+    public function testCreateFromSetsWithInvalidSetsDataShouldThrowSetException2(): void
+    {
+        $this->expectExceptionObject(SetException::invalidSetsData());
+        Set::createFromSets('string', [new Set('string', ['text1']), 'text']);
+
+    }
+
+    /**
+     * @return void
+     * @throws RuntimeException
+     * @throws SetException
+     * @throws HandlerException
+     */
+    public function testCreateFromSetsWithSetsNotAllOfSameTypeShouldThrowSetException2(): void
+    {
+        $this->expectExceptionObject(SetException::setsNotAllOfSameType(new StringType(), new IntegerType()));
+        Set::createFromSets('string', [new Set('string', ['text1']), new Set('int', [1, 2, 3])]);
+    }
+
+    /**
+     * @return void
+     * @throws HandlerException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     * @throws SetException
+     * @throws ExpectationFailedException
+     */
+    public function testCreateFromSetsWithMultipleSetOfTheSameTypeShouldSuccessfullyCreateNewSetWithAllTheData(): void
+    {
+        $result = Set::createFromSets(
+            'string',
+            [new Set('string', ['text1']), new Set('string', ['text2']), new Set('string', ['text1']), new Set('string', ['text5'])]
+        );
+        self::assertEquals(['text1', 'text2', 'text5'], $result->toArray());
     }
 
     /**

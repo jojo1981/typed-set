@@ -123,4 +123,57 @@ class SetException extends DomainException
     {
         return new self('Set is empty. ' . $message);
     }
+
+    /**
+     * @param string $type
+     * @param string $otherType
+     * @return self
+     */
+    public static function couldNotMergeSets(string $type, string $otherType): self
+    {
+        return new self(sprintf(
+            'Can not merge typed sets with different types. This set is of ' .
+            'type: `%s` and the other collection which can not be merged is of type: `%s`',
+            $type,
+            $otherType
+        ));
+    }
+
+    /**
+     * @return self
+     */
+    public static function emptySets(): self
+    {
+        return new self('An empty array with typed sets passed');
+    }
+
+    /**
+     * @return self
+     */
+    public static function notEnoughSets(): self
+    {
+        return new self('At least 2 sets needs to be passed');
+    }
+
+    /**
+     * @return self
+     */
+    public static function invalidSetsData(): self
+    {
+        return new self('Expect $sets array to contain instances of Set');
+    }
+
+    /**
+     * @param TypeInterface $expectedType
+     * @param TypeInterface $actualType
+     * @return self
+     */
+    public static function setsNotAllOfSameType(TypeInterface $expectedType, TypeInterface $actualType): self
+    {
+        return new self(sprintf(
+            'Expect every collection to be of type: `%s`. Collection found with type: `%s`',
+            $expectedType->getName(),
+            $actualType->getName()
+        ));
+    }
 }
