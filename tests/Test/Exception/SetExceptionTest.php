@@ -9,6 +9,7 @@
  */
 namespace Jojo1981\TypedSet\TestSuite\Test\Exception;
 
+use Exception;
 use Jojo1981\PhpTypes\TypeInterface;
 use Jojo1981\TypedSet\Exception\SetException;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -18,7 +19,7 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
 /**
  * @package Jojo1981\TypedSet\TestSuite\Test\Exception
  */
-class SetExceptionTest extends TestCase
+final class SetExceptionTest extends TestCase
 {
     /**
      * @throws InvalidArgumentException
@@ -60,7 +61,7 @@ class SetExceptionTest extends TestCase
      */
     public function testGivenTypeIsNotValidShouldReturnSetException(): void
     {
-        $previous = new \Exception('Previous exception');
+        $previous = new Exception('Previous exception');
         $exception = SetException::givenTypeIsNotValid('invalidType', $previous);
         self::assertEquals(
             'Given type: `invalidType` is not a valid type and also not an existing class',
@@ -76,7 +77,7 @@ class SetExceptionTest extends TestCase
      */
     public function testDeterminedTypeIsNotValidShouldReturnSetException(): void
     {
-        $previous = new \Exception('Previous exception');
+        $previous = new Exception('Previous exception');
         $exception = SetException::determinedTypeIsNotValid('null', $previous);
         self::assertEquals(
             'Determined type: `null` is not a valid type and also not an existing class',
@@ -117,7 +118,7 @@ class SetExceptionTest extends TestCase
      */
     public function testCouldNotCreateTypeFromValueShouldReturnSetException(): void
     {
-        $previous = new \Exception('Previous exception');
+        $previous = new Exception('Previous exception');
         $exception = SetException::couldNotCreateTypeFromValue($previous);
         self::assertEquals(
             'Could not create type from value',
@@ -133,7 +134,7 @@ class SetExceptionTest extends TestCase
      */
     public function testCouldNotCreateTypeFromTypeNameShouldReturnSetException(): void
     {
-        $previous = new \Exception('Previous exception');
+        $previous = new Exception('Previous exception');
         $exception = SetException::couldNotCreateTypeFromTypeName('null', $previous);
         self::assertEquals(
             'Could not create type from type name: `null`',

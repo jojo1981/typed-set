@@ -12,7 +12,7 @@ namespace Jojo1981\TypedSet;
 /**
  * @package Jojo1981\TypedSet
  */
-class Difference
+final class Difference
 {
     /** @var array */
     private array $missingElements;

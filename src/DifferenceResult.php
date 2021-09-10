@@ -12,7 +12,7 @@ namespace Jojo1981\TypedSet;
 /**
  * @package Jojo1981\TypedSet
  */
-class DifferenceResult
+final class DifferenceResult
 {
     /** @var Difference */
     private Difference $lhs;

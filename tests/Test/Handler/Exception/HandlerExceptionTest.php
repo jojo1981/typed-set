@@ -26,9 +26,9 @@ use stdClass;
 final class HandlerExceptionTest extends TestCase
 {
     /**
-     * @throws InvalidArgumentException
-     * @throws ExpectationFailedException
      * @return void
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
      */
     public function testCanNotHandleElementWithoutTypes(): void
     {
@@ -79,24 +79,23 @@ final class HandlerExceptionTest extends TestCase
      * @param TypeInterface $expectedType
      * @param TypeInterface $actualType
      * @param string $expectedMessage
-     * @throws InvalidArgumentException
-     * @throws ExpectationFailedException
      * @return void
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
      */
     public function testCanNotHandleElementOnlyWithBothTypes(
         TypeInterface $expectedType,
         TypeInterface $actualType,
         string $expectedMessage
-    ): void
-    {
+    ): void {
         $exception = HandlerException::canNotHandleElement($expectedType, $actualType);
         self::assertEquals($expectedMessage, $exception->getMessage());
     }
 
     /**
-     * @throws InvalidArgumentException
-     * @throws ExpectationFailedException
      * @return void
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
      */
     public function testCanNotHandleElementBecauseNoHandlerAvailable(): void
     {
