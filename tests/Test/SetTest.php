@@ -442,10 +442,11 @@ final class SetTest extends TestCase
      * @param Set $setB
      * @param bool $expectedResult
      * @return void
+     * @throws HandlerException
      * @throws InvalidArgumentException
+     * @throws RuntimeException
      * @throws SetException
      * @throws ExpectationFailedException
-     * @throws HandlerException
      */
     public function testIsEqual(Set $setA, Set $setB, bool $expectedResult): void
     {
@@ -473,9 +474,11 @@ final class SetTest extends TestCase
      * @param Set $setB
      * @param DifferenceResult $expectedResult
      * @return void
+     * @throws HandlerException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
      * @throws SetException
      * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
      */
     public function testCompare(Set $setA, Set $setB, DifferenceResult $expectedResult): void
     {
@@ -688,6 +691,63 @@ final class SetTest extends TestCase
 
         };
         $set->map($mapper, 'string');
+    }
+
+    /**
+     * @return void
+     * @throws RuntimeException
+     * @throws SetException
+     * @throws HandlerException
+     */
+    public function testPopElementOnEmptySetShouldThrowSetException(): void
+    {
+        $this->expectExceptionObject(SetException::setIsEmpty('Could not pop an element of the end of of the set.'));
+        (new Set('string'))->popElement();
+    }
+
+    /**
+     * @return void
+     * @throws HandlerException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     * @throws SetException
+     * @throws ExpectationFailedException
+     */
+    public function testPopElementOnNotEmptySetShouldRemoveTheLastElementFromTheSetAndReturnIt(): void
+    {
+        $set = new Set('string', ['text1', 'text2']);
+        self::assertCount(2, $set);
+        self::assertEquals('text2', $set->popElement());
+        self::assertCount(1, $set);
+    }
+
+    /**
+     * @return void
+     * @throws RuntimeException
+     * @throws SetException
+     * @throws HandlerException
+     */
+    public function testShiftElementOnEmptySetShouldThrowSetException(): void
+    {
+        $this->expectExceptionObject(SetException::setIsEmpty('Could not shift an element of the beginning of the set.'));
+        (new Set('string'))->shiftElement();
+    }
+
+    /**
+     * @return void
+     * @throws HandlerException
+     * @throws InvalidArgumentException
+     * @throws PHPUnitFrameworkException
+     * @throws RuntimeException
+     * @throws SetException
+     * @throws ExpectationFailedException
+     */
+    public function testShiftElementOnNotEmptySetShouldRemoveTheFirstElementFromTheSetAndReturnIt(): void
+    {
+        $set = new Set('string', ['text1', 'text2']);
+        self::assertCount(2, $set);
+        self::assertEquals('text1', $set->shiftElement());
+        self::assertCount(1, $set);
     }
 
     /**

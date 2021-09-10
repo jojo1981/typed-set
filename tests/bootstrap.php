@@ -7,7 +7,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed in the root of the source code
  */
-
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 DG\BypassFinals::enable();
