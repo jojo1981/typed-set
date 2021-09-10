@@ -495,6 +495,11 @@ final class SetDataProvider
                 new Set(TestHashableEntity1::class, [new TestHashableEntity1('test1'), new TestHashableEntity1('test2')]),
                 new Set(TestHashableEntity1::class, [new TestHashableEntity1('test2')]),
                 false
+            ],
+            [
+                new Set('string', ['text1', 'text3', 'text2', 'text6']),
+                new Set('string', ['text1', 'text7', 'text3', 'text6']),
+                false
             ]
         ];
     }
