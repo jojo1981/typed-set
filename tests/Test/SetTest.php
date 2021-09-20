@@ -1117,4 +1117,26 @@ final class SetTest extends TestCase
         $set = new Set('object', [$item1, $item2, $item3, $item4]);
         self::assertCount(4, $set);
     }
+
+    /**
+     * @dataProvider \Jojo1981\TypedSet\TestSuite\DataProvider\SetDataProvider::getConstructorTestData
+     *
+     * @param string $type
+     * @param Set $elementsAsSet
+     * @param array $elementsAsArray
+     * @return void
+     * @throws HandlerException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     * @throws SetException
+     * @throws ExpectationFailedException
+     */
+    public function testConstructorUsingSetInsteadOfArrayForElementsShouldResultInSameSetConstruction(
+        string $type,
+        Set $elementsAsSet,
+        array $elementsAsArray
+    ): void
+    {
+        self::assertEquals(new Set($type, $elementsAsSet), new Set($type, $elementsAsArray));
+    }
 }

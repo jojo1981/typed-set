@@ -547,6 +547,26 @@ final class SetDataProvider
     }
 
     /**
+     * @return array[]
+     * @throws RuntimeException
+     * @throws SetException
+     * @throws HandlerException
+     */
+    public function getConstructorTestData(): array
+    {
+        return [
+            ['string', new Set('string', ['text1', 'text2', 'text0']), ['text1', 'text2', 'text0']],
+            ['int', new Set('int', [5, 9, -24]), [5, 9, -24]],
+            [
+                TestHashableEntity1::class,
+                new Set(TestHashableEntity1::class, [new TestHashableEntity1('test1'), new TestHashableEntity1('test2')]),
+                [new TestHashableEntity1('test1'), new TestHashableEntity1('test2')]
+            ],
+            ['array', new Set('array', [['a'], [3, 6, 's']]), [['a'], [3, 6, 's']]]
+        ];
+    }
+
+    /**
      * @return DifferenceResult
      */
     private function createEmptyIsEqualDifferenceResult(): DifferenceResult

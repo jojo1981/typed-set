@@ -58,16 +58,16 @@ class Set implements Countable, IteratorAggregate
 
     /**
      * @param string $type
-     * @param T[] $elements
+     * @param Set<T>|T[] $elements
      * @throws HandlerException
      * @throws SetException
      * @throws RuntimeException
      */
-    public function __construct(string $type, array $elements = [])
+    public function __construct(string $type, $elements = [])
     {
         static::assertGivenType($type);
         $this->type = self::createTypeFromName($type);
-        $this->addAll($elements);
+        $this->addAll($elements instanceof Set ? $elements->toArray() : $elements);
     }
 
     /**
@@ -497,7 +497,7 @@ class Set implements Countable, IteratorAggregate
     {
         self::assertGivenType($type);
         $typeValue = self::createTypeFromName($type);
-        self::assertCollections($sets, $typeValue);
+        self::assertSets($sets, $typeValue);
 
         $result = new Set($typeValue->getName());
         foreach ($sets as $set) {
@@ -513,7 +513,7 @@ class Set implements Countable, IteratorAggregate
      * @return void
      * @throws SetException
      */
-    private static function assertCollections(array $sets, TypeInterface $typeValue): void
+    private static function assertSets(array $sets, TypeInterface $typeValue): void
     {
         if (empty($sets)) {
             throw SetException::emptySets();
