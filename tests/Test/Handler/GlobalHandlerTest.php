@@ -83,8 +83,6 @@ final class GlobalHandlerTest extends TestCase
      *
      * @return void
      * @throws TypeException
-     * @throws ValueException
-     * @throws RuntimeException
      * @throws HandlerException
      */
     public function testGetHashWithUnsupportedElement(): void

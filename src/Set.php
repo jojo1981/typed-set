@@ -18,6 +18,7 @@ use Jojo1981\PhpTypes\AbstractType;
 use Jojo1981\PhpTypes\ClassType;
 use Jojo1981\PhpTypes\Exception\TypeException;
 use Jojo1981\PhpTypes\TypeInterface;
+use Jojo1981\PhpTypes\Value\ClassName;
 use Jojo1981\TypedSet\Exception\SetException;
 use Jojo1981\TypedSet\Handler\Exception\HandlerException;
 use Jojo1981\TypedSet\Handler\GlobalHandler;
@@ -37,6 +38,7 @@ use function is_object;
 use function json_encode;
 use function reset;
 use function spl_object_hash;
+use function strpos;
 use function strtolower;
 
 /**
@@ -165,7 +167,12 @@ class Set implements Countable, IteratorAggregate
      */
     public function getType(): string
     {
-        return $this->type->getName();
+        $name = $this->type->getName();
+        if ($this->type->isClass() && 0 !== strpos($name, ClassName::NAMESPACE__SEPARATOR)) {
+            $name = ClassName::NAMESPACE__SEPARATOR . $name;
+        }
+
+        return $name;
     }
 
     /**

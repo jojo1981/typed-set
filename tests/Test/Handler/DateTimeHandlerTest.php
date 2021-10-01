@@ -69,7 +69,7 @@ final class DateTimeHandlerTest extends TestCase
     public function testGetHashWithInvalidElement(): void
     {
         $this->expectException(HandlerException::class);
-        $this->expectExceptionMessage('Can not handle element, element not an instance of: `\DateTimeInterface`, but an instance of: `\stdClass`');
+        $this->expectExceptionMessage('Can not handle element, element not an instance of: `DateTimeInterface`, but an instance of: `stdClass`');
         $this->expectExceptionCode(0);
         /** @noinspection PhpParamsInspection */
         $this->handler->getHash(new stdClass(), AbstractType::createFromTypeName(stdClass::class));

@@ -541,7 +541,7 @@ final class SetTest extends TestCase
     public function testMapWithValidTypeWithMapperReturningViolatingDataDataSetShouldThrowSetException(): void
     {
         $this->expectException(SetException::class);
-        $this->expectExceptionMessage('Mapper is not returning a correct value. Data is not of type: `int`, but an instance of: `\stdClass`');
+        $this->expectExceptionMessage('Mapper is not returning a correct value. Data is not of type: `int`, but an instance of: `stdClass`');
         $this->expectExceptionCode(0);
         $mapper = static function () {
             return new stdClass();

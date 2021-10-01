@@ -38,17 +38,17 @@ final class HandlerExceptionDataProvider
             [
                 AbstractType::createFromTypeName(stdClass::class),
                 AbstractType::createFromTypeName('number'),
-                'Can not handle element, element not an instance of: `\stdClass`, but of type: `float`'
+                'Can not handle element, element not an instance of: `stdClass`, but of type: `float`'
             ],
             [
                 AbstractType::createFromTypeName('bool'),
                 AbstractType::createFromTypeName(stdClass::class),
-                'Can not handle element, element not of type: `bool`, but an instance of: `\stdClass`'
+                'Can not handle element, element not of type: `bool`, but an instance of: `stdClass`'
             ],
             [
                 AbstractType::createFromTypeName(TestEntity::class),
                 AbstractType::createFromTypeName(stdClass::class),
-                'Can not handle element, element not an instance of: `\Jojo1981\TypedSet\TestSuite\Fixture\TestEntity`, but an instance of: `\stdClass`'
+                'Can not handle element, element not an instance of: `Jojo1981\TypedSet\TestSuite\Fixture\TestEntity`, but an instance of: `stdClass`'
             ]
         ];
     }

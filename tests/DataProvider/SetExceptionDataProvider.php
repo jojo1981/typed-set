@@ -50,13 +50,13 @@ final class SetExceptionDataProvider
             [
                 new ClassType(new ClassName(__CLASS__)),
                 new FloatType(),
-                'Data is not an instance of: `\Jojo1981\TypedSet\TestSuite\DataProvider\SetExceptionDataProvider`, but of type: `float`',
+                'Data is not an instance of: `Jojo1981\TypedSet\TestSuite\DataProvider\SetExceptionDataProvider`, but of type: `float`',
                 null
             ],
             [
                 new FloatType(),
                 new ClassType(new ClassName(__CLASS__)),
-                'Prefix. Data is not of type: `float`, but an instance of: `\Jojo1981\TypedSet\TestSuite\DataProvider\SetExceptionDataProvider`',
+                'Prefix. Data is not of type: `float`, but an instance of: `Jojo1981\TypedSet\TestSuite\DataProvider\SetExceptionDataProvider`',
                 'Prefix. '
             ]
         ];

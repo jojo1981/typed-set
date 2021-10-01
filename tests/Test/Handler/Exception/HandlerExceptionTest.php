@@ -68,7 +68,7 @@ final class HandlerExceptionTest extends TestCase
 
         $exception2 = HandlerException::canNotHandleElement(AbstractType::createFromTypeName(stdClass::class));
         self::assertEquals(
-            'Can not handle element, element not an instance of: `\stdClass`',
+            'Can not handle element, element not an instance of: `stdClass`',
             $exception2->getMessage()
         );
     }
