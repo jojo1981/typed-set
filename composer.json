@@ -22,7 +22,7 @@
     "php": "^7.4|^8.0",
     "ext-json": "*",
     "jojo1981/contracts": "^1.0",
-    "jojo1981/php-types": "^2.1|^3.0"
+    "jojo1981/php-types": "^3.0"
   },
   "autoload": {
     "psr-4": {

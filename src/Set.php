@@ -18,11 +18,9 @@ use Jojo1981\PhpTypes\AbstractType;
 use Jojo1981\PhpTypes\ClassType;
 use Jojo1981\PhpTypes\Exception\TypeException;
 use Jojo1981\PhpTypes\TypeInterface;
-use Jojo1981\PhpTypes\Value\ClassName;
 use Jojo1981\TypedSet\Exception\SetException;
 use Jojo1981\TypedSet\Handler\Exception\HandlerException;
 use Jojo1981\TypedSet\Handler\GlobalHandler;
-use RuntimeException;
 use Traversable;
 use function array_filter;
 use function array_key_exists;
@@ -38,7 +36,6 @@ use function is_object;
 use function json_encode;
 use function reset;
 use function spl_object_hash;
-use function strpos;
 use function strtolower;
 
 /**
@@ -63,7 +60,6 @@ class Set implements Countable, IteratorAggregate
      * @param Set<T>|T[] $elements
      * @throws HandlerException
      * @throws SetException
-     * @throws RuntimeException
      */
     public function __construct(string $type, $elements = [])
     {
@@ -75,7 +71,6 @@ class Set implements Countable, IteratorAggregate
     /**
      * @param T $element
      * @return void
-     * @throws RuntimeException
      * @throws SetException
      * @throws HandlerException
      */
@@ -90,7 +85,6 @@ class Set implements Countable, IteratorAggregate
     /**
      * @param T[] $elements
      * @return void
-     * @throws RuntimeException
      * @throws SetException
      * @throws HandlerException
      */
@@ -103,10 +97,9 @@ class Set implements Countable, IteratorAggregate
 
     /**
      * @param T $element
-     * @throws HandlerException
-     * @throws RuntimeException
-     * @throws SetException
      * @return bool
+     * @throws SetException
+     * @throws HandlerException
      */
     public function contains($element): bool
     {
@@ -117,10 +110,9 @@ class Set implements Countable, IteratorAggregate
 
     /**
      * @param T $element
-     * @throws HandlerException
-     * @throws RuntimeException
-     * @throws SetException
      * @return void
+     * @throws SetException
+     * @throws HandlerException
      */
     public function remove($element): void
     {
@@ -167,12 +159,7 @@ class Set implements Countable, IteratorAggregate
      */
     public function getType(): string
     {
-        $name = $this->type->getName();
-        if ($this->type->isClass() && 0 !== strpos($name, ClassName::NAMESPACE__SEPARATOR)) {
-            $name = ClassName::NAMESPACE__SEPARATOR . $name;
-        }
-
-        return $name;
+        return $this->type->getName();
     }
 
     /**
@@ -186,10 +173,9 @@ class Set implements Countable, IteratorAggregate
 
     /**
      * @param Set $other
-     * @throws HandlerException
-     * @throws RuntimeException
-     * @throws SetException
      * @return bool
+     * @throws SetException
+     * @throws HandlerException
      */
     public function isEqual(Set $other): bool
     {
@@ -207,10 +193,9 @@ class Set implements Countable, IteratorAggregate
 
     /**
      * @param Set $other
-     * @throws HandlerException
-     * @throws RuntimeException
-     * @throws SetException
      * @return DifferenceResult
+     * @throws SetException
+     * @throws HandlerException
      */
     public function compare(Set $other): DifferenceResult
     {
@@ -257,8 +242,8 @@ class Set implements Countable, IteratorAggregate
      * @param callable $mapper
      * @param null|string $type
      * @return Set
-     * @throws RuntimeException
      * @throws SetException
+     * @throws HandlerException
      */
     public function map(callable $mapper, ?string $type = null): Set
     {
@@ -319,10 +304,9 @@ class Set implements Countable, IteratorAggregate
 
     /**
      * @param callable $predicate
-     * @throws HandlerException
-     * @throws RuntimeException
-     * @throws SetException
      * @return Set
+     * @throws SetException
+     * @throws HandlerException
      */
     public function filter(callable $predicate): Set
     {
@@ -411,7 +395,6 @@ class Set implements Countable, IteratorAggregate
      * @param Set $otherSet
      * @param Set ...$otherSets
      * @return $this
-     * @throws RuntimeException
      * @throws SetException
      * @throws HandlerException
      */
@@ -433,7 +416,6 @@ class Set implements Countable, IteratorAggregate
     /**
      * @param mixed $element
      * @return void
-     * @throws RuntimeException
      * @throws SetException
      */
     private function assertElementIsValid($element): void
@@ -479,8 +461,8 @@ class Set implements Countable, IteratorAggregate
     /**
      * @param T[] $elements
      * @return Set
-     * @throws RuntimeException
      * @throws SetException
+     * @throws HandlerException
      */
     public static function createFromElements(array $elements): Set
     {
@@ -497,8 +479,8 @@ class Set implements Countable, IteratorAggregate
      * @param string $type
      * @param Set[] $sets
      * @return Set
-     * @throws RuntimeException
      * @throws SetException
+     * @throws HandlerException
      */
     public static function createFromSets(string $type, array $sets): Set
     {
@@ -577,7 +559,6 @@ class Set implements Countable, IteratorAggregate
     /**
      * @param mixed $value
      * @return TypeInterface
-     * @throws RuntimeException
      * @throws SetException
      */
     private static function createTypeFromValue($value): TypeInterface
@@ -592,7 +573,6 @@ class Set implements Countable, IteratorAggregate
     /**
      * @param string $typeName
      * @return TypeInterface
-     * @throws RuntimeException
      * @throws SetException
      */
     private static function createTypeFromName(string $typeName): TypeInterface

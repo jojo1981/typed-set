@@ -1135,8 +1135,7 @@ final class SetTest extends TestCase
         string $type,
         Set $elementsAsSet,
         array $elementsAsArray
-    ): void
-    {
+    ): void {
         self::assertEquals(new Set($type, $elementsAsSet), new Set($type, $elementsAsArray));
     }
 }

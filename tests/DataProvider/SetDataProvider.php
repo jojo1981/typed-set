@@ -308,11 +308,11 @@ final class SetDataProvider
             ['callable', 'callable'],
             ['callback', 'callable'],
             ['iterable', 'iterable'],
-            [stdClass::class, '\\' . stdClass::class],
-            [InterfaceTestEntity::class, '\\' . InterfaceTestEntity::class],
-            [AbstractTestEntity::class, '\\' . AbstractTestEntity::class],
-            [TestEntityBase::class, '\\' . TestEntityBase::class],
-            [TestEntity::class, '\\' . TestEntity::class]
+            [stdClass::class, stdClass::class],
+            [InterfaceTestEntity::class, InterfaceTestEntity::class],
+            [AbstractTestEntity::class, AbstractTestEntity::class],
+            [TestEntityBase::class, TestEntityBase::class],
+            [TestEntity::class, TestEntity::class]
         ];
     }
 
