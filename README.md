@@ -9,7 +9,7 @@ A typed set data structure
 
 Author: Joost Nijhuis <[jnijhuis81@gmail.com](mailto:jnijhuis81@gmail.com)>
 
-The typed set is an unordered mutable set.
+The typed set is an ordered mutable set.
 
 When a new set is created the `type` for the set *MUST* be given.  
 Also a set can be created based on elements by using: `\Jojo1981\TypedSet\Set::createFromElements`.  
