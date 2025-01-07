@@ -61,7 +61,7 @@ class Set implements Countable, IteratorAggregate
      * @throws HandlerException
      * @throws SetException
      */
-    public function __construct(string $type, $elements = [])
+    public function __construct(string $type, Set|array $elements = [])
     {
         static::assertGivenType($type);
         $this->type = self::createTypeFromName($type);
@@ -147,7 +147,7 @@ class Set implements Countable, IteratorAggregate
     }
 
     /**
-     * @return array
+     * @return T[]
      */
     public function toArray(): array
     {
@@ -277,7 +277,7 @@ class Set implements Countable, IteratorAggregate
     }
 
     /**
-     * @return mixed
+     * @return T
      * @throws SetException
      */
     public function popElement()
@@ -290,7 +290,7 @@ class Set implements Countable, IteratorAggregate
     }
 
     /**
-     * @return mixed
+     * @return T
      * @throws SetException
      */
     public function shiftElement()
@@ -414,7 +414,7 @@ class Set implements Countable, IteratorAggregate
     }
 
     /**
-     * @param mixed $element
+     * @param T $element
      * @return void
      * @throws SetException
      */
@@ -427,7 +427,7 @@ class Set implements Countable, IteratorAggregate
     }
 
     /**
-     * @param mixed $element
+     * @param T $element
      * @throws HandlerException
      * @return string
      */
@@ -561,7 +561,7 @@ class Set implements Countable, IteratorAggregate
      * @return TypeInterface
      * @throws SetException
      */
-    private static function createTypeFromValue($value): TypeInterface
+    private static function createTypeFromValue(mixed $value): TypeInterface
     {
         try {
             return AbstractType::createFromValue($value);
