@@ -1,6 +1,7 @@
 A typed set data structure
 =====================
 
+[![PHP Build](https://github.com/jojo1981/typed-set/actions/workflows/php.yml/badge.svg)](https://github.com/jojo1981/typed-set/actions/workflows/php.yml)
 [![Coverage Status](https://coveralls.io/repos/github/jojo1981/typed-set/badge.svg)](https://coveralls.io/github/jojo1981/typed-set)
 [![Latest Stable Version](https://poser.pugx.org/jojo1981/typed-set/v/stable)](https://packagist.org/packages/jojo1981/typed-set)
 [![Total Downloads](https://poser.pugx.org/jojo1981/typed-set/downloads)](https://packagist.org/packages/jojo1981/typed-set)
