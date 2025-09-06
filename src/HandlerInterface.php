@@ -25,15 +25,15 @@ interface HandlerInterface
      * @param TypeInterface $type
      * @return bool
      */
-    public function support($element, TypeInterface $type): bool;
+    public function support(mixed $element, TypeInterface $type): bool;
 
     /**
      * Return a hash string for the given element, but throw a HandlerException when something is wrong.
      *
      * @param mixed $element
      * @param TypeInterface $type
-     * @throws HandlerException
      * @return string
+     * @throws HandlerException
      */
-    public function getHash($element, TypeInterface $type): string;
+    public function getHash(mixed $element, TypeInterface $type): string;
 }

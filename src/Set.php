@@ -69,16 +69,34 @@ class Set implements Countable, IteratorAggregate
     }
 
     /**
-     * @param T $element
+     * @param string $type
      * @return void
      * @throws SetException
-     * @throws HandlerException
      */
-    public function add($element): void
+    private static function assertGivenType(string $type): void
     {
-        $this->assertElementIsValid($element);
-        if (!$this->contains($element)) {
-            $this->elements[$this->getHashForElement($element)] = $element;
+        if (in_array(strtolower($type), self::NOT_SUPPORTED_TYPES)) {
+            throw SetException::givenTypeIsNotValid($type);
+        }
+
+        try {
+            self::createTypeFromName($type);
+        } catch (Exception $exception) {
+            throw SetException::givenTypeIsNotValid($type, $exception);
+        }
+    }
+
+    /**
+     * @param string $typeName
+     * @return TypeInterface
+     * @throws SetException
+     */
+    private static function createTypeFromName(string $typeName): TypeInterface
+    {
+        try {
+            return AbstractType::createFromTypeName($typeName);
+        } catch (TypeException $exception) {
+            throw SetException::couldNotCreateTypeFromTypeName($typeName, $exception);
         }
     }
 
@@ -97,6 +115,47 @@ class Set implements Countable, IteratorAggregate
 
     /**
      * @param T $element
+     * @return void
+     * @throws SetException
+     * @throws HandlerException
+     */
+    public function add($element): void
+    {
+        $this->assertElementIsValid($element);
+        if (!$this->contains($element)) {
+            $this->elements[$this->getHashForElement($element)] = $element;
+        }
+    }
+
+    /**
+     * @param T $element
+     * @return void
+     * @throws SetException
+     */
+    private function assertElementIsValid($element): void
+    {
+        if (!$this->type->isAssignableValue($element)) {
+            $otherType = self::createTypeFromValue($element);
+            throw SetException::dataIsNotOfExpectedType($this->type, $otherType);
+        }
+    }
+
+    /**
+     * @param mixed $value
+     * @return TypeInterface
+     * @throws SetException
+     */
+    private static function createTypeFromValue(mixed $value): TypeInterface
+    {
+        try {
+            return AbstractType::createFromValue($value);
+        } catch (TypeException $exception) { // @codeCoverageIgnore
+            throw SetException::couldNotCreateTypeFromValue($exception); // @codeCoverageIgnore
+        }
+    }
+
+    /**
+     * @param T $element
      * @return bool
      * @throws SetException
      * @throws HandlerException
@@ -106,6 +165,140 @@ class Set implements Countable, IteratorAggregate
         $this->assertElementIsValid($element);
 
         return array_key_exists($this->getHashForElement($element), $this->elements);
+    }
+
+    /**
+     * @param T $element
+     * @return string
+     * @throws HandlerException
+     */
+    private function getHashForElement($element): string
+    {
+        if (is_object($element)) {
+            if ($this->type instanceof ClassType) {
+                if ($element instanceof ContractsHashableInterface) {
+                    return $element->getHash();
+                }
+
+                if (GlobalHandler::getInstance()->support($element, $this->type)) {
+                    return GlobalHandler::getInstance()->getHash($element, $this->type);
+                }
+            }
+
+            return spl_object_hash($element);
+        }
+
+        if (GlobalHandler::getInstance()->support($element, $this->type)) {
+            return GlobalHandler::getInstance()->getHash($element, $this->type);
+        }
+
+        if (is_array($element)) {
+            return hash('sha256', json_encode($element));
+        }
+
+        return (string) $element;
+    }
+
+    /**
+     * @return T[]
+     */
+    public function toArray(): array
+    {
+        return array_values($this->elements);
+    }
+
+    /**
+     * @param T[] $elements
+     * @return Set
+     * @throws SetException
+     * @throws HandlerException
+     */
+    public static function createFromElements(array $elements): Set
+    {
+        if (empty($elements)) {
+            throw SetException::emptyElementsCanNotDetermineType();
+        }
+
+        return new self((self::createTypeFromValue(reset($elements)))->getName(), $elements);
+    }
+
+    /**
+     * Create one collection from multiple collections.
+     *
+     * @param string $type
+     * @param Set[] $sets
+     * @return Set
+     * @throws SetException
+     * @throws HandlerException
+     */
+    public static function createFromSets(string $type, array $sets): Set
+    {
+        self::assertGivenType($type);
+        $typeValue = self::createTypeFromName($type);
+        self::assertSets($sets, $typeValue);
+
+        $result = new Set($typeValue->getName());
+        foreach ($sets as $set) {
+            $result->merge($set);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param Set[] $sets
+     * @param TypeInterface $typeValue
+     * @return void
+     * @throws SetException
+     */
+    private static function assertSets(array $sets, TypeInterface $typeValue): void
+    {
+        if (empty($sets)) {
+            throw SetException::emptySets();
+        }
+        if (count($sets) < 2) {
+            throw SetException::notEnoughSets();
+        }
+        foreach ($sets as $collection) {
+            if (!$collection instanceof self) {
+                throw SetException::invalidSetsData();
+            }
+            if (!$typeValue->isAssignableType($collection->type)) {
+                throw SetException::setsNotAllOfSameType($typeValue, $collection->type);
+            }
+        }
+    }
+
+    /**
+     * Merge other set(s) into this set. All sets should be exactly of the same type.
+     *
+     * @param Set $otherSet
+     * @param Set ...$otherSets
+     * @return $this
+     * @throws SetException
+     * @throws HandlerException
+     */
+    public function merge(Set $otherSet, Set ...$otherSets): self
+    {
+        array_unshift($otherSets, $otherSet);
+
+        foreach ($otherSets as $currentOtherCollection) {
+            if (!$this->type->isAssignableType($currentOtherCollection->type)) {
+                throw SetException::couldNotMergeSets($this->type->getName(), $otherSet->getType());
+            }
+
+            $this->addAll($currentOtherCollection->toArray());
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type->getName();
     }
 
     /**
@@ -133,62 +326,17 @@ class Set implements Countable, IteratorAggregate
     /**
      * @return bool
      */
-    public function isEmpty(): bool
-    {
-        return empty($this->elements);
-    }
-
-    /**
-     * @return bool
-     */
     public function isNonEmpty(): bool
     {
         return !$this->isEmpty();
     }
 
     /**
-     * @return T[]
-     */
-    public function toArray(): array
-    {
-        return array_values($this->elements);
-    }
-
-    /**
-     * @return string
-     */
-    public function getType(): string
-    {
-        return $this->type->getName();
-    }
-
-    /**
-     * @param TypeInterface $type
      * @return bool
      */
-    public function isEqualType(TypeInterface $type): bool
+    public function isEmpty(): bool
     {
-        return $this->type->isEqual($type);
-    }
-
-    /**
-     * @param Set $other
-     * @return bool
-     * @throws SetException
-     * @throws HandlerException
-     */
-    public function isEqual(Set $other): bool
-    {
-        if (!$this->isEqualType($other->type) || $this->count() !== $other->count()) {
-            return false;
-        }
-        foreach ($this->elements as $element) {
-            if (!$other->contains($element)) {
-                return false;
-            }
-        }
-
-        return true;
+        return empty($this->elements);
     }
 
     /**
@@ -236,6 +384,43 @@ class Set implements Countable, IteratorAggregate
     }
 
     /**
+     * @param TypeInterface $type
+     * @return bool
+     */
+    public function isEqualType(TypeInterface $type): bool
+    {
+        return $this->type->isEqual($type);
+    }
+
+    /**
+     * @param Set $other
+     * @return bool
+     * @throws SetException
+     * @throws HandlerException
+     */
+    public function isEqual(Set $other): bool
+    {
+        if (!$this->isEqualType($other->type) || $this->count() !== $other->count()) {
+            return false;
+        }
+        foreach ($this->elements as $element) {
+            if (!$other->contains($element)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @return int
+     */
+    public function count(): int
+    {
+        return count($this->elements);
+    }
+
+    /**
      * Map this Set into new Set using the passed mapper callback. When type is omitted it will be determined by the
      * first result the mapper function produces.
      *
@@ -274,6 +459,24 @@ class Set implements Countable, IteratorAggregate
         }
 
         return new Set($typeObject->getName(), $newElements);
+    }
+
+    /**
+     * @param string $type
+     * @return void
+     * @throws SetException
+     */
+    private static function assertDeterminedType(string $type): void
+    {
+        if (in_array(strtolower($type), self::NOT_SUPPORTED_TYPES)) {
+            throw SetException::determinedTypeIsNotValid($type);
+        }
+
+        try {
+            self::createTypeFromName($type);
+        } catch (Exception $exception) { // @codeCoverageIgnore
+            throw SetException::determinedTypeIsNotValid($type, $exception); // @codeCoverageIgnore
+        }
     }
 
     /**
@@ -374,213 +577,10 @@ class Set implements Countable, IteratorAggregate
     }
 
     /**
-     * @return int
-     */
-    public function count(): int
-    {
-        return count($this->elements);
-    }
-
-    /**
      * @return Traversable
      */
     public function getIterator(): Traversable
     {
         return new ArrayIterator($this->toArray());
-    }
-
-    /**
-     * Merge other set(s) into this set. All sets should be exactly of the same type.
-     *
-     * @param Set $otherSet
-     * @param Set ...$otherSets
-     * @return $this
-     * @throws SetException
-     * @throws HandlerException
-     */
-    public function merge(Set $otherSet, Set ...$otherSets): self
-    {
-        array_unshift($otherSets, $otherSet);
-
-        foreach ($otherSets as $currentOtherCollection) {
-            if (!$this->type->isAssignableType($currentOtherCollection->type)) {
-                throw SetException::couldNotMergeSets($this->type->getName(), $otherSet->getType());
-            }
-
-            $this->addAll($currentOtherCollection->toArray());
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param T $element
-     * @return void
-     * @throws SetException
-     */
-    private function assertElementIsValid($element): void
-    {
-        if (!$this->type->isAssignableValue($element)) {
-            $otherType = self::createTypeFromValue($element);
-            throw SetException::dataIsNotOfExpectedType($this->type, $otherType);
-        }
-    }
-
-    /**
-     * @param T $element
-     * @throws HandlerException
-     * @return string
-     */
-    private function getHashForElement($element): string
-    {
-        if (is_object($element)) {
-            if ($this->type instanceof ClassType) {
-                if ($element instanceof ContractsHashableInterface) {
-                    return $element->getHash();
-                }
-
-                if (GlobalHandler::getInstance()->support($element, $this->type)) {
-                    return GlobalHandler::getInstance()->getHash($element, $this->type);
-                }
-            }
-
-            return spl_object_hash($element);
-        }
-
-        if (GlobalHandler::getInstance()->support($element, $this->type)) {
-            return GlobalHandler::getInstance()->getHash($element, $this->type);
-        }
-
-        if (is_array($element)) {
-            return hash('sha256', json_encode($element));
-        }
-
-        return (string) $element;
-    }
-
-    /**
-     * @param T[] $elements
-     * @return Set
-     * @throws SetException
-     * @throws HandlerException
-     */
-    public static function createFromElements(array $elements): Set
-    {
-        if (empty($elements)) {
-            throw SetException::emptyElementsCanNotDetermineType();
-        }
-
-        return new self((self::createTypeFromValue(reset($elements)))->getName(), $elements);
-    }
-
-    /**
-     * Create one collection from multiple collections.
-     *
-     * @param string $type
-     * @param Set[] $sets
-     * @return Set
-     * @throws SetException
-     * @throws HandlerException
-     */
-    public static function createFromSets(string $type, array $sets): Set
-    {
-        self::assertGivenType($type);
-        $typeValue = self::createTypeFromName($type);
-        self::assertSets($sets, $typeValue);
-
-        $result = new Set($typeValue->getName());
-        foreach ($sets as $set) {
-            $result->merge($set);
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param Set[] $sets
-     * @param TypeInterface $typeValue
-     * @return void
-     * @throws SetException
-     */
-    private static function assertSets(array $sets, TypeInterface $typeValue): void
-    {
-        if (empty($sets)) {
-            throw SetException::emptySets();
-        }
-        if (count($sets) < 2) {
-            throw SetException::notEnoughSets();
-        }
-        foreach ($sets as $collection) {
-            if (!$collection instanceof self) {
-                throw SetException::invalidSetsData();
-            }
-            if (!$typeValue->isAssignableType($collection->type)) {
-                throw SetException::setsNotAllOfSameType($typeValue, $collection->type);
-            }
-        }
-    }
-
-    /**
-     * @param string $type
-     * @throws SetException
-     * @return void
-     */
-    private static function assertGivenType(string $type): void
-    {
-        if (in_array(strtolower($type), self::NOT_SUPPORTED_TYPES)) {
-            throw SetException::givenTypeIsNotValid($type);
-        }
-
-        try {
-            self::createTypeFromName($type);
-        } catch (Exception $exception) {
-            throw SetException::givenTypeIsNotValid($type, $exception);
-        }
-    }
-
-    /**
-     * @param string $type
-     * @throws SetException
-     * @return void
-     */
-    private static function assertDeterminedType(string $type): void
-    {
-        if (in_array(strtolower($type), self::NOT_SUPPORTED_TYPES)) {
-            throw SetException::determinedTypeIsNotValid($type);
-        }
-
-        try {
-            self::createTypeFromName($type);
-        } catch (Exception $exception) { // @codeCoverageIgnore
-            throw SetException::determinedTypeIsNotValid($type, $exception); // @codeCoverageIgnore
-        }
-    }
-
-    /**
-     * @param mixed $value
-     * @return TypeInterface
-     * @throws SetException
-     */
-    private static function createTypeFromValue(mixed $value): TypeInterface
-    {
-        try {
-            return AbstractType::createFromValue($value);
-        } catch (TypeException $exception) { // @codeCoverageIgnore
-            throw SetException::couldNotCreateTypeFromValue($exception); // @codeCoverageIgnore
-        }
-    }
-
-    /**
-     * @param string $typeName
-     * @return TypeInterface
-     * @throws SetException
-     */
-    private static function createTypeFromName(string $typeName): TypeInterface
-    {
-        try {
-            return AbstractType::createFromTypeName($typeName);
-        } catch (TypeException $exception) {
-            throw SetException::couldNotCreateTypeFromTypeName($typeName, $exception);
-        }
     }
 }

@@ -22,17 +22,17 @@ final class PersonHandler implements HandlerInterface
      * @param TypeInterface $type
      * @return bool
      */
-    public function support($element, TypeInterface $type): bool
+    public function support(mixed $element, TypeInterface $type): bool
     {
         return $element instanceof Person;
     }
 
     /**
-     * @param Person $element
+     * @param mixed $element
      * @param TypeInterface $type
      * @return string
      */
-    public function getHash($element, TypeInterface $type): string
+    public function getHash(mixed $element, TypeInterface $type): string
     {
         return $element->getName() . '|' . $element->getAge();
     }
