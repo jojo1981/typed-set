@@ -1,0 +1,4 @@
+parameters:
+  treatPhpDocTypesAsCertain: false
+  ignoreErrors:
+    - '#Unsafe call to private method Jojo1981\\TypedSet\\Set<T>::assertGivenType\(\) through static::.#'

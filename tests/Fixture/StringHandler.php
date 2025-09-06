@@ -23,7 +23,7 @@ final class StringHandler implements HandlerInterface
      * @param TypeInterface $type
      * @return bool
      */
-    public function support($element, TypeInterface $type): bool
+    public function support(mixed $element, TypeInterface $type): bool
     {
         return is_string($element);
     }
@@ -33,7 +33,7 @@ final class StringHandler implements HandlerInterface
      * @param TypeInterface $type
      * @return string
      */
-    public function getHash($element, TypeInterface $type): string
+    public function getHash(mixed $element, TypeInterface $type): string
     {
         return 'test-hash-generated-by-string-handler';
     }

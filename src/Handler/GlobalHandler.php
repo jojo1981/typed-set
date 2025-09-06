@@ -21,7 +21,7 @@ use function get_class;
  */
 final class GlobalHandler implements HandlerInterface
 {
-    /** @var HandlerInterface[]  */
+    /** @var HandlerInterface[] */
     private array $handlers = [];
 
     /**
@@ -54,28 +54,21 @@ final class GlobalHandler implements HandlerInterface
     }
 
     /**
-     * @param mixed $element
-     * @param TypeInterface $type
-     * @return bool
+     * @param HandlerInterface $handler
+     * @return void
      */
-    public function support($element, TypeInterface $type): bool
+    public function registerHandler(HandlerInterface $handler): void
     {
-        foreach ($this->handlers as $handler) {
-            if ($handler->support($element, $type)) {
-                return true;
-            }
-        }
-
-        return false;
+        $this->handlers[get_class($handler)] = $handler;
     }
 
     /**
      * @param mixed $element
      * @param TypeInterface $type
-     * @throws HandlerException
      * @return string
+     * @throws HandlerException
      */
-    public function getHash($element, TypeInterface $type): string
+    public function getHash(mixed $element, TypeInterface $type): string
     {
         foreach ($this->handlers as $handler) {
             if ($handler->support($element, $type)) {
@@ -87,11 +80,18 @@ final class GlobalHandler implements HandlerInterface
     }
 
     /**
-     * @param HandlerInterface $handler
-     * @return void
+     * @param mixed $element
+     * @param TypeInterface $type
+     * @return bool
      */
-    public function registerHandler(HandlerInterface $handler): void
+    public function support(mixed $element, TypeInterface $type): bool
     {
-        $this->handlers[get_class($handler)] = $handler;
+        foreach ($this->handlers as $handler) {
+            if ($handler->support($element, $type)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
