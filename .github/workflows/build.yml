@@ -16,11 +16,13 @@ jobs:
 
     strategy:
       fail-fast: false
+      max-parallel: 6
       matrix:
         php-version: [ "8.0", "8.1", "8.2", "8.3", "8.4", "8.5" ]
+        antlr-runtime: [ "^0.9", "^0.10" ]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -34,15 +36,18 @@ jobs:
 
       - name: Cache Composer packages
         id: composer-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: vendor
-          key: ${{ runner.os }}-php-${{ matrix.php-version }}-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-php-${{ matrix.php-version }}-antlr-${{ matrix.antlr-runtime }}-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
-            ${{ runner.os }}-php-${{ matrix.php-version }}-
+            ${{ runner.os }}-php-${{ matrix.php-version }}-antlr-${{ matrix.antlr-runtime }}-
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
+
+      - name: Install ANTLR runtime version ${{ matrix.antlr-runtime }}
+        run: composer require "antlr/antlr4-php-runtime:${{ matrix.antlr-runtime }}" --prefer-dist --no-progress
 
       - name: Lint PHP files
         run: |
@@ -59,7 +64,7 @@ jobs:
         run: composer run-script test
 
       - name: Upload coverage results to Coveralls
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && matrix.antlr-runtime == '^0.10'
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: |
